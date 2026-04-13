@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TS/SCI // ARTEMIS II POST-MISSION ARCHIVE</title>
+    <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-base: #010409;
+            --panel-bg: rgba(6, 14, 24, 0.85);
+            --panel-border: #1a365d;
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --blueprint-blue: #3b82f6;
+            --blueprint-bg: rgba(15, 23, 42, 0.9);
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #2563eb;
+            --accent-green: #10b981;
+            --accent-gold: #f59e0b;
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: 'Arial', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base); color: var(--text-main);
+            font-family: var(--font-mono); margin: 0; padding: 0;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            user-select: none; -webkit-touch-callout: none;
+            background-image: radial-gradient(circle at center, #0a192f 0%, #010409 100%);
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); border-left: 1px solid var(--panel-border); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 0; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+        body::after {
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            z-index: 9999; background-size: 100% 3px; pointer-events: none; opacity: 0.5;
+        }
+
+        /* --- LOGIN SCREEN (NASA THEME) --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images-assets.nasa.gov/image/ARTEMIS-I_LIFTOFF/ARTEMIS-I_LIFTOFF~orig.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: 100000; color: var(--text-main);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        
+        #login-screen::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(1, 4, 9, 0.85); backdrop-filter: blur(5px);
+        }
+
+        .login-box {
+            position: relative; z-index: 100001;
+            border: 1px solid var(--accent-blue); padding: 40px; background: rgba(15, 23, 42, 0.8);
+            max-width: 550px; width: 100%; box-shadow: 0 0 40px rgba(37, 99, 235, 0.3);
+            backdrop-filter: blur(10px); border-radius: 4px; text-align: center;
+        }
+
+        .login-logos { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .login-logos img { height: 50px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        
+        .login-header { border-bottom: 1px solid var(--panel-border); padding-bottom: 15px; margin-bottom: 25px; }
+        .login-header h1 { margin: 0; font-size: 18px; color: #fff; font-family: var(--font-sans); letter-spacing: 2px;}
+        .login-header p { margin: 5px 0 0 0; color: var(--accent-cyan); font-size: 12px; }
+
+        .warning-text { color: var(--accent-gold); font-size: 10px; margin-bottom: 20px; letter-spacing: 1px; line-height: 1.4;}
+        
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: bold;}
+        .input-group input {
+            width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--panel-border);
+            color: #fff; padding: 12px; font-family: var(--font-mono); font-size: 14px; outline: none; transition: all 0.3s;
+        }
+        .input-group input:focus { border-color: var(--accent-cyan); box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.2); }
+        
+        #login-btn {
+            background: linear-gradient(90deg, var(--accent-blue) 0%, #1e40af 100%);
+            color: #fff; border: 1px solid var(--blueprint-blue); padding: 12px 20px;
+            font-family: var(--font-sans); font-weight: bold; letter-spacing: 2px; cursor: pointer; width: 100%;
+            font-size: 14px; transition: all 0.2s; text-transform: uppercase;
+        }
+        #login-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
+        #login-error { color: var(--accent-red); margin-top: 15px; font-weight: bold; font-size: 12px; height: 15px; }
+
+        /* --- BOOT SEQUENCE --- */
+        #boot-screen {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; z-index: 10000; color: var(--text-main);
+            padding: 30px; font-size: 13px; flex-direction: column;
+            overflow-y: hidden; box-shadow: inset 0 0 100px rgba(37, 99, 235, 0.2);
+        }
+        .boot-line { opacity: 0; animation: fadeIn 0.05s forwards; margin-bottom: 3px; word-wrap: break-word;}
+        .boot-sys { color: var(--accent-blue); font-weight: bold; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* --- HEADER AREA --- */
+        header {
+            background-color: var(--panel-bg); border-bottom: 2px solid var(--accent-blue);
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 10; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); flex-wrap: wrap; gap: 10px;
+        }
+        .logo-area { display: flex; align-items: center; gap: 15px; flex-wrap: wrap;}
+        
+        .agency-logos {
+            display: flex; align-items: center; gap: 10px;
+            border-right: 1px solid var(--panel-border); padding-right: 15px;
+        }
+        .agency-logos img { height: 35px; width: auto; object-fit: contain; }
+
+        .sys-title { font-size: 10px; color: var(--text-muted); line-height: 1.3; }
+        .sys-title strong { color: #fff; font-size: 12px; letter-spacing: 1px; font-family: var(--font-sans);}
+
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .sys-date { font-size: 11px; color: var(--accent-cyan); font-weight: bold; text-align: right; border-right: 1px solid var(--panel-border); padding-right: 15px;}
+        .clearance {
+            background: rgba(239, 68, 68, 0.1); color: var(--accent-red); padding: 5px 15px; 
+            font-weight: bold; font-size: 12px; letter-spacing: 2px; border: 1px solid var(--accent-red); 
+            text-align: center; white-space: nowrap; font-family: var(--font-sans);
+        }
+
+        /* --- MAIN DASHBOARD LAYOUT --- */
+        .main-container { display: flex; flex: 1; overflow: hidden; flex-direction: row; }
+
+        /* LEFT: Blueprint Sidebar */
+        .sidebar-blueprint {
+            width: 320px; background-color: var(--blueprint-bg); border-right: 1px solid var(--panel-border);
+            padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0;
+        }
+
+        /* USER CREDENTIAL BOX */
+        .user-profile {
+            border: 1px solid var(--accent-cyan); background: rgba(6, 182, 212, 0.05); padding: 10px;
+            display: flex; gap: 15px; align-items: center;
+        }
+        .user-avatar { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border: 1px solid var(--accent-cyan); display: flex; justify-content: center; align-items: center; font-size: 24px; color: var(--accent-cyan); }
+        .user-info { font-size: 10px; line-height: 1.4; }
+        .user-info strong { color: #fff; font-size: 12px; letter-spacing: 1px;}
+        .status-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 5px var(--accent-green); margin-right: 4px;}
+
+        .blueprint-header {
+            color: var(--accent-cyan); font-weight: bold; font-size: 11px; border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 5px; text-align: center; letter-spacing: 1px; font-family: var(--font-sans); text-transform: uppercase;
+        }
+        
+        .rocket-stack-wrapper { width: 100%; display: flex; justify-content: center; }
+        .rocket-stack { display: flex; flex-direction: column; align-items: center; width: 120px; position: relative; margin-bottom: 10px; }
+        
+        .shape { border: 1px solid var(--blueprint-blue); background: rgba(59, 130, 246, 0.1); position: relative; display: flex; justify-content: center; align-items: center; }
+        
+        .stage-las { width: 6px; height: 35px; background: transparent; border: none; border-bottom: 35px solid rgba(59, 130, 246, 0.5); border-left: 4px solid transparent; border-right: 4px solid transparent; margin-bottom: -1px; }
+        .stage-cm { width: 40px; height: 25px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); margin-bottom: 2px; border-bottom: 1px solid var(--blueprint-blue); }
+        .stage-esm { width: 40px; height: 40px; margin-bottom: 2px; }
+        .stage-lvsa { width: 70px; height: 35px; clip-path: polygon(28% 0%, 72% 0%, 100% 100%, 0% 100%); margin-bottom: 2px; border: none; background: rgba(59, 130, 246, 0.2); }
+        .stage-core { width: 70px; height: 260px; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;}
+        
+        .srb { position: absolute; width: 16px; height: 290px; border: 1px solid var(--blueprint-blue); background: rgba(59, 130, 246, 0.15); top: 110px; z-index: 1;}
+        .srb-left { left: -10px; border-radius: 50px 50px 0 0; }
+        .srb-right { right: -10px; border-radius: 50px 50px 0 0; }
+        .srb-nozzle { position: absolute; bottom: -10px; width: 10px; left: 2px; height: 10px; border-bottom: 10px solid var(--blueprint-blue); border-left: 3px solid transparent; border-right: 3px solid transparent; opacity: 0.7;}
+        
+        .engine-sec { position: absolute; bottom: -12px; width: 60px; display: flex; justify-content: space-around; }
+        .rs25 { width: 12px; height: 12px; border-bottom: 12px solid var(--accent-cyan); border-left: 3px solid transparent; border-right: 3px solid transparent; opacity: 0.8;}
+
+        .stage-label-box { width: 100%; text-align: left; font-size: 9px; margin-top: 5px; border-top: 1px dotted var(--panel-border); padding-top: 8px;}
+        .stage-label-box strong { color: var(--text-main); font-size: 10px; display: block; margin-bottom: 3px; font-family: var(--font-sans);}
+        .p-stat { display: flex; justify-content: space-between; padding: 2px 0; color: #fff;}
+        .p-stat span:first-child { color: var(--text-muted); }
+
+        /* CENTER: Complex Data Area */
+        .content-area {
+            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .graphs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .chart-box {
+            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; position: relative; height: 220px; border-radius: 4px;
+        }
+        .chart-title { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
+        .chart-title span:last-child { color: var(--accent-cyan); }
+
+        .middle-section { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; min-height: 200px; }
+        
+        .terminal-log {
+            background: #000; border: 1px solid var(--panel-border); border-left: 3px solid var(--accent-blue);
+            padding: 15px; overflow-y: auto; font-size: 10px; color: var(--text-muted); display: flex; flex-direction: column; border-radius: 4px;
+        }
+        .log-entry { margin-bottom: 5px; line-height: 1.4;}
+        .log-time { color: var(--accent-cyan); margin-right: 8px; opacity: 0.8;}
+        .log-crit { color: var(--accent-red); font-weight: bold; }
+        .log-success { color: var(--accent-green); }
+
+        .crew-matrix {
+            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; font-size: 10px; overflow-y: auto; border-radius: 4px;
+        }
+        .crew-header { color: #fff; font-weight: bold; border-bottom: 1px dashed var(--text-muted); margin-bottom: 10px; padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
+        .crew-member { margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; border-left: 2px solid var(--accent-cyan);}
+        .crew-name { color: #fff; font-weight: bold; font-size: 11px;}
+        .crew-role { color: var(--text-muted); font-size: 9px; margin-bottom: 4px;}
+        .crew-stat { display: flex; justify-content: space-between; font-size: 9px;}
+
+        /* Bottom: Image Grid */
+        .db-header {
+            font-size: 12px; color: #fff; border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px; margin-top: 10px; display: flex; justify-content: space-between; font-weight: bold; letter-spacing: 1px; font-family: var(--font-sans);
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; padding-bottom: 40px; }
+        .card {
+            background-color: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 4px;
+            cursor: pointer; position: relative; transition: all 0.2s; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .card:hover { border-color: var(--accent-blue); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2); transform: translateY(-2px); z-index: 5;}
+        .card-img-container { position: relative; height: 140px; background: #000; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid var(--panel-border);}
+        .card-img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: grayscale(80%) sepia(10%) hue-rotate(180deg) brightness(0.7); transition: all 0.4s;
+        }
+        .card:hover .card-img { filter: grayscale(0%) brightness(1); }
+        .text-doc-icon { font-size: 30px; color: var(--accent-blue); font-family: var(--font-sans); font-weight: bold;}
+        .overlay-badge {
+            position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8);
+            color: #fff; font-size: 9px; padding: 4px 8px; border: 1px solid var(--accent-blue); border-radius: 2px;
+        }
+        .card-meta { padding: 12px; font-size: 9px; line-height: 1.5; flex: 1; display: flex; flex-direction: column; justify-content: center;}
+        .meta-row { display: flex; justify-content: space-between; border-bottom: 1px dotted rgba(100, 116, 140, 0.3); padding: 4px 0; }
+        .meta-row:last-child { border-bottom: none; }
+        .meta-label { color: var(--text-muted); }
+        .meta-value { color: #fff; text-align: right; max-width: 65%; word-wrap: break-word;}
+
+        /* --- MODALS --- */
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(1, 4, 9, 0.95); z-index: 100; backdrop-filter: blur(5px);}
+        #modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: var(--panel-bg); border: 1px solid var(--accent-blue); padding: 30px; z-index: 101; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px rgba(37, 99, 235, 0.3); border-radius: 4px;
+        }
+        #fullscreen-viewer {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 200; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; padding: 20px; box-sizing: border-box;
+        }
+        #fullscreen-img { max-width: 100%; max-height: 85%; border: 1px solid var(--accent-blue); box-shadow: 0 0 30px rgba(0,0,0,0.5); object-fit: contain; display: none; border-radius: 4px;}
+        
+        /* TEXT VIEWER WITH CRT SCANLINES */
+        #fullscreen-text-wrapper {
+            position: relative; max-width: 800px; width: 100%; height: 80%; display: none;
+            border: 1px solid var(--accent-cyan); box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+        }
+        #fullscreen-text-wrapper::after {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 10;
+        }
+        #fullscreen-text { color: var(--accent-green); font-family: var(--font-mono); text-align: left; width: 100%; height: 100%; overflow-y: auto; white-space: pre-wrap; font-size: 13px; background: #000; padding: 30px; line-height: 1.5; text-shadow: 0 0 3px var(--accent-green);}
+
+        @media (max-width: 1024px) {
+            .middle-section { grid-template-columns: 1fr; height: auto;}
+            .crew-matrix { height: auto; }
+            .graphs-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            body, html { height: auto; overflow: visible; }
+            .main-container { flex-direction: column; height: auto; overflow: visible; }
+            .sidebar-blueprint { width: 100%; border-right: none; border-bottom: 1px solid var(--panel-border); min-height: auto; overflow: visible; }
+            .content-area { overflow-y: visible; height: auto; }
+            header { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px;}
+            .logo-area { justify-content: center; width: 100%; text-align: center;}
+            .agency-logos { border-right: none; padding-right: 0; flex-wrap: wrap; justify-content: center;}
+            .header-right { flex-direction: column; align-items: stretch;}
+            .sys-date { text-align: center; border-right: none; padding-right: 0; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 5px;}
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="login-logos">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg" alt="NASA">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Seal_of_the_United_States_Department_of_the_Navy.svg" alt="US Navy">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Mark_of_the_United_States_Air_Force.svg/960px-Mark_of_the_United_States_Air_Force.svg.png" alt="US Air Force">
+                <img src="https://upload.wikimedia.org/wikipedia/lv/f/fa/Logo_ESA.png" alt="ESA">
+            </div>
+            
+            <div class="login-header">
+                <h1>JOINT TACTICAL ARCHIVE</h1>
+                <p>DEEP SPACE NETWORK // NODE JSC-4</p>
+            </div>
+            
+            <div class="warning-text">
+                WARNING: THIS SYSTEM CONTAINS TOP SECRET (TS/SCI) POST-MISSION DATA FOR ARTEMIS II. UNAUTHORIZED ACCESS WILL BE LOGGED AND TRACED BY DOD CYBER COMMAND.
+            </div>
+            
+            <div class="input-group">
+                <label for="user">IDENTIFICATION (USER):</label>
+                <input type="text" id="user" autocomplete="off" placeholder="Enter Analyst ID...">
+            </div>
+            <div class="input-group">
+                <label for="pass">SECURITY KEY (PASS):</label>
+                <input type="password" id="pass" autocomplete="off" placeholder="Enter Secure Passcode...">
+            </div>
+            
+            <button id="login-btn" onclick="verifyLogin()">AUTHENTICATE CREDENTIALS</button>
+            <div id="login-error"></div>
+        </div>
+    </div>
+
+    <div id="boot-screen"></div>
+
+    <div id="main-ui" style="display: none; height: 100%; flex-direction: column;">
+        <header>
+            <div class="logo-area">
+                <div class="agency-logos">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg" alt="NASA Logo">
+                </div>
+                <div class="sys-title">
+                    <strong>ARTEMIS II POST-FLIGHT ANALYSIS SYSTEM</strong><br>
+                    ARCHIVE RECORDED: MISSION COMPLETE
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="sys-date">SYS DATE: APR 13, 2026<br>STATUS: ARCHIVED</div>
+                <div class="clearance">TS/SCI // EYES ONLY</div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar-blueprint">
+                <div class="user-profile">
+                    <div class="user-avatar">V</div>
+                    <div class="user-info">
+                        <strong>VICTORIA2026</strong><br>
+                        <span style="color:var(--text-muted)">CLEARANCE:</span> LEVEL 5 (TS/SCI)<br>
+                        <span class="status-dot"></span><span style="color:var(--accent-green)">SECURE CONNECTION</span>
+                    </div>
+                </div>
+
+                <div class="blueprint-header">SLS POST-FLIGHT HARDWARE INTEGRITY</div>
+                
+                <div class="rocket-stack-wrapper">
+                    <div class="rocket-stack">
+                        <div class="srb srb-left">
+                            <span style="writing-mode: vertical-rl; transform: rotate(180deg); color:#fff; font-size:7px; font-weight:bold; height:100%; text-align:center;">SRB (PORT) JETTISONED</span>
+                            <div class="srb-nozzle"></div>
+                        </div>
+                        <div class="srb srb-right">
+                            <span style="writing-mode: vertical-rl; transform: rotate(180deg); color:#fff; font-size:7px; font-weight:bold; height:100%; text-align:center;">SRB (STBD) JETTISONED</span>
+                            <div class="srb-nozzle"></div>
+                        </div>
+                        
+                        <div class="stage-las"></div>
+                        <div class="shape stage-cm" style="border-color: var(--accent-green); box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);">
+                            <span style="font-size:6px; color:#fff;">ORION</span>
+                        </div>
+                        <div class="shape stage-esm"></div>
+                        <div class="shape stage-lvsa"></div>
+                        <div class="shape stage-core">
+                            <div class="engine-sec">
+                                <div class="rs25"></div><div class="rs25"></div><div class="rs25"></div><div class="rs25"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stage-label-box">
+                    <strong>ORION CREW MODULE (RECOVERED)</strong>
+                    <div class="p-stat"><span>SPLASHDOWN:</span> <span style="color:var(--accent-cyan)">PACIFIC Z-9</span></div>
+                    <div class="p-stat"><span>HEAT SHIELD:</span> <span style="color:var(--accent-red)">41% ABLATED</span></div>
+                    <div class="p-stat"><span>HULL INT:</span> <span style="color:var(--accent-green)">99.8% NOMINAL</span></div>
+                </div>
+
+                <div class="stage-label-box">
+                    <strong>ICPS / ESM STAGES (EXPENDED)</strong>
+                    <div class="p-stat"><span>ESM BURN:</span> <span style="color:var(--accent-green)">SUCCESS</span></div>
+                    <div class="p-stat"><span>SEP PYRO:</span> <span style="color:var(--text-muted)">CONFIRMED</span></div>
+                </div>
+
+                <div class="stage-label-box">
+                    <strong>CORE STAGE (EXPENDED)</strong>
+                    <div class="p-stat"><span>MECO STATE:</span> <span style="color:var(--text-main)">T+00:08:04</span></div>
+                    <div class="p-stat"><span>ENGINE E2047:</span> <span style="color:var(--accent-green)">109% (MAX)</span></div>
+                    <div class="p-stat"><span>ENGINE E2059:</span> <span style="color:var(--accent-green)">109% (MAX)</span></div>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <div class="graphs-grid">
+                    <div class="chart-box">
+                        <div class="chart-title"><span>ORION CM: ENTRY THERMAL LOAD</span> <span>APR 2026 ARCHIVE</span></div>
+                        <canvas id="thermalChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title"><span>RS-25 ASCENT PRESSURE LOG</span> <span>ARCHIVED</span></div>
+                        <canvas id="engineChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title"><span>CREW G-FORCE PROFILE</span> <span>FULL MISSION</span></div>
+                        <canvas id="gforceChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title"><span>RADIATION DOSIMETRY (VAN ALLEN)</span> <span>FINAL DATA</span></div>
+                        <canvas id="radChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="middle-section">
+                    <div class="terminal-log" id="term-log">
+                        <div style="color:#fff; border-bottom:1px solid var(--panel-border); margin-bottom:10px; padding-bottom:5px; font-weight:bold;">POST-MISSION DECRYPTION LOG // APR 13, 2026</div>
+                    </div>
+                    
+                    <div class="crew-matrix">
+                        <div class="crew-header">CREW FINAL MEDICAL CLEARANCE</div>
+                        <div class="crew-member">
+                            <div class="crew-name">WISEMAN, REID</div><div class="crew-role">COMMANDER (CDR)</div>
+                            <div class="crew-stat"><span>POST-FLIGHT EVAL:</span> <span style="color:var(--accent-green)">CLEARED</span></div>
+                        </div>
+                        <div class="crew-member">
+                            <div class="crew-name">GLOVER, VICTOR</div><div class="crew-role">PILOT (PLT)</div>
+                            <div class="crew-stat"><span>POST-FLIGHT EVAL:</span> <span style="color:var(--accent-green)">CLEARED</span></div>
+                        </div>
+                        <div class="crew-member">
+                            <div class="crew-name">KOCH, CHRISTINA</div><div class="crew-role">MISSION SPEC 1 (MS1)</div>
+                            <div class="crew-stat"><span>POST-FLIGHT EVAL:</span> <span style="color:var(--accent-green)">CLEARED</span></div>
+                        </div>
+                        <div class="crew-member" style="margin-bottom:0;">
+                            <div class="crew-name">HANSEN, JEREMY (CSA)</div><div class="crew-role">MISSION SPEC 2 (MS2)</div>
+                            <div class="crew-stat"><span>POST-FLIGHT EVAL:</span> <span style="color:var(--accent-green)">CLEARED</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="db-header">
+                        <span>DECRYPTED OPTICAL & TELEMETRY ARCHIVE</span>
+                        <span id="asset-count">COUNT: 0</span>
+                    </div>
+                    <div class="grid" id="data-grid" style="margin-top: 15px;"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="modal-overlay"></div>
+    <div id="modal">
+        <h2 style="color: var(--accent-blue); margin-top:0; font-family: var(--font-sans); letter-spacing: 1px;">DOD PROTOCOL 4A</h2>
+        <p id="modal-text" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Decrypting historical file structure...</p>
+        <div style="width: 100%; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); margin-top: 20px; overflow: hidden;">
+            <div id="progress-bar" style="width: 0%; height: 100%; background-color: var(--accent-blue); transition: width 0.1s;"></div>
+        </div>
+        <div id="hex-dump" style="margin-top: 15px; font-size: 9px; color: var(--text-muted); text-align: left; height: 60px; overflow: hidden; opacity: 0.5; word-wrap: break-word; font-family: var(--font-mono);"></div>
+    </div>
+
+    <div id="fullscreen-viewer" onclick="closeViewer()">
+        <img id="fullscreen-img" src="">
+        <div id="fullscreen-text-wrapper">
+            <div id="fullscreen-text"></div>
+        </div>
+        <div style="color: var(--text-muted); margin-top: 20px; font-size: 11px; letter-spacing: 2px; text-align: center;">[ CLICK ANYWHERE TO CLOSE ]</div>
+    </div>
+
+    <script>
+        // --- ANTI-SNOOPING ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false; };
+
+        // --- LOGIN LOGIC ---
+        function verifyLogin() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            const err = document.getElementById('login-error');
+            
+            if(u === 'Victoria2026' && p === 'ARTVIC26@METLAT') {
+                document.getElementById('login-screen').style.display = 'none';
+                startBootSequence();
+            } else {
+                err.innerText = "ACCESS DENIED. INVALID IDENTIFICATION OR KEY.";
+                setTimeout(() => err.innerText = "", 3000);
+            }
+        }
+
+        document.getElementById('pass').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') verifyLogin();
+        });
+
+        // --- BOOT SEQUENCE ---
+        function startBootSequence() {
+            const bootScreen = document.getElementById('boot-screen');
+            bootScreen.style.display = 'flex';
+            const bootText = [
+                "ESTABLISHING SECURE CONNECTION TO JSC DATABASE...", 
+                "VERIFYING PIV CERTIFICATE: CMDR. VICTORIA [ACCEPTED]...",
+                "SYNCING TIMESTAMPS: CURRENT DATE APR 13, 2026...",
+                "LOADING SLS BLOCK 1 POST-FLIGHT MATRICES...", 
+                "BYPASSING NSA FIREWALL RULE 40-B...",
+                "DECRYPTING MISSION ASSET ARCHIVE...", 
+                "WELCOME. ACCESS GRANTED: TS/SCI."
+            ];
+            
+            let delay = 0;
+            bootText.forEach(text => {
+                setTimeout(() => {
+                    const p = document.createElement('div'); p.className = 'boot-line'; 
+                    p.innerHTML = `<span class="boot-sys">[SYS]</span> ${text}`;
+                    bootScreen.appendChild(p);
+                }, delay);
+                delay += 400 + Math.random() * 500;
+            });
+            setTimeout(() => { 
+                bootScreen.style.display = 'none'; 
+                document.getElementById('main-ui').style.display = 'flex'; 
+                initCharts(); startTerminal(); loadDatabase();
+            }, delay + 800);
+        }
+
+        // --- CHART.JS CONFIGURATIONS ---
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Courier New', Courier, monospace";
+
+        function initCharts() {
+            const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(30, 58, 138, 0.2)' } }, y: { grid: { color: 'rgba(30, 58, 138, 0.2)' } } }, elements: { point: { radius: 0 } } };
+            new Chart(document.getElementById('thermalChart'), { type: 'line', data: { labels: ['EI', 'EI+2m', 'EI+4m', 'EI+6m', 'EI+8m', 'EI+10m', 'SPLASH'], datasets: [{ data: [20, 1500, 2760, 2500, 1200, 400, 25], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }] }, options: commonOptions });
+            new Chart(document.getElementById('engineChart'), { type: 'line', data: { labels: ['T-0', 'T+1m', 'T+2m', 'T+3m', 'T+4m', 'T+6m', 'MECO'], datasets: [ { data: [0, 104, 109, 109, 104, 109, 0], borderColor: '#06b6d4', borderWidth: 2, tension: 0.1 } ] }, options: commonOptions });
+            new Chart(document.getElementById('gforceChart'), { type: 'line', data: { labels: ['LAUNCH', 'SRB SEP', 'MECO', 'TLI', 'COAST', 'ENTRY', 'CHUTES'], datasets: [{ data: [1.5, 2.5, 3.8, 1.2, 0, 8.5, 3.2], borderColor: '#f59e0b', borderWidth: 2, tension: 0.3, stepped: true }] }, options: commonOptions });
+            new Chart(document.getElementById('radChart'), { type: 'bar', data: { labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10'], datasets: [{ data: [0.3, 0.4, 0.1, 0.1, 0.05, 0.1, 0.1, 0.4, 0.3, 0.1], backgroundColor: '#2563eb' }] }, options: commonOptions });
+        }
+
+        // --- TERMINAL LOG GENERATOR ---
+        function startTerminal() {
+            const term = document.getElementById('term-log');
+            const messages = [ 
+                "SYNCING DATA WITH USS JOHN P. MURTHA...", 
+                "VERIFYING CHECKSUM: E2047_TELEMETRY.dat", 
+                "EXTRACTING ORION CABIN AUDIO (APR 2026 ARCHIVE)...", 
+                "PARSING HISTORICAL FLIGHT DYNAMICS LOGS...", 
+                "CM SEPARATION PYRO SEQUENCE CONFIRMED.",
+                "UPLINKING FINAL REPORT TO PENTAGON SERVER..."
+            ];
+            setInterval(() => {
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                const time = new Date().toISOString().substring(11, 19);
+                const isSuccess = msg.includes("CONFIRMED") || msg.includes("SUCCESS");
+                const el = document.createElement('div'); el.className = 'log-entry';
+                el.innerHTML = `<span class="log-time">[${time}]</span> <span class="${isSuccess ? 'log-success' : ''}">${msg}</span>`;
+                term.appendChild(el); term.scrollTop = term.scrollHeight;
+            }, 2500);
+        }
+
+        // --- MASSIVE DATABASE GENERATION ---
+        const imgPool = [
+            "https://live.staticflickr.com/65535/55200122336_8d6756f6a9_6k.jpg", "https://live.staticflickr.com/65535/55200266103_f9f5a07753_6k.jpg", 
+            "https://live.staticflickr.com/65535/55196918247_026e7cffe8_6k.jpg", "https://live.staticflickr.com/65535/55178108936_1c65adb37e_6k.jpg", 
+            "https://live.staticflickr.com/65535/55178366804_7770ea01b5_6k.jpg", "https://live.staticflickr.com/65535/55157743705_4f1f71cd25_6k.jpg", 
+            "https://live.staticflickr.com/65535/55158262063_3ef1d1fcb6_6k.jpg", "https://live.staticflickr.com/65535/55158478535_d9f89d3da7_6k.jpg",  
+            "https://live.staticflickr.com/65535/55158440580_a855e0b2be_6k.jpg", "https://live.staticflickr.com/65535/55046149221_08dfb970ee_6k.jpg",  
+            "https://live.staticflickr.com/65535/55045500537_244dfc802c_4k.jpg", "https://live.staticflickr.com/65535/55051964289_44824dc0af_4k.jpg",  
+            "https://live.staticflickr.com/65535/55045217264_7b3edc27c2_4k.jpg", "https://live.staticflickr.com/65535/55045294650_a3e659039a_4k.jpg",  
+            "https://live.staticflickr.com/65535/55204060255_a8a9172602_4k.jpg", "https://live.staticflickr.com/65535/55197973768_ffa4c483e8_4k.jpg",
+            "https://live.staticflickr.com/65535/55194546724_3c249530b6_4k.jpg", "https://live.staticflickr.com/65535/55182033617_d8fed28c4b_4k.jpg",
+            "https://live.staticflickr.com/65535/55172335892_32c7d87777_6k.jpg", "https://live.staticflickr.com/65535/55050488758_54e2d54c83_6k.jpg",
+            "https://live.staticflickr.com/65535/55046455103_e524feb6f2_6k.jpg", "https://i.sstatic.net/H9pu1.jpg",
+            "https://www.nasa.gov/wp-content/uploads/2020/05/maf_20191107_engine_section_full_jude-3198_large.jpg",
+            "https://www.nasa.gov/wp-content/uploads/2023/12/ksc-20231127-ph-kls01-0020-2.jpg?w=1920",
+            "https://upload.wikimedia.org/wikipedia/commons/5/58/Space_Shuttle_external_tank_assembly_01.jpg",
+            "https://images-assets.nasa.gov/image/jsc2022e045002/jsc2022e045002~large.jpg?w=1920&h=1440&fit=clip&crop=faces%2Cfocalpoint",
+            "https://media.cnn.com/api/v1/images/stellar/prod/ksc-20200702-ph-ilw01-0002-large.jpg?c=original"
+        ];
+
+        let dbSource = [];
+        const agencies = ["NASA // FIDO", "DOD // JTF", "NRO // SIGINT", "USSF // RADAR", "ESA // ESM OPS"];
+        
+        // 1. ADD ALL IMAGES FIRST
+        for(let i=0; i<imgPool.length; i++) {
+            dbSource.push({
+                id: `OPT-${Math.floor(Math.random()*9000)+1000}-A`,
+                b: agencies[Math.floor(Math.random()*agencies.length)],
+                s: "CLASSIFIED OPTICAL ARCHIVE",
+                f: "DEEP SPACE NETWORK",
+                c: Math.random() > 0.5 ? "TS/SCI" : "SECRET",
+                img: i, type: 'img'
+            });
+        }
+
+        // 2. ADD TECHNICAL DATA FILES
+        const textSubjects = [
+            { s: "ORBITAL DYNAMICS // TLI VECTORS", key: "orbit" },
+            { s: "THERMODYNAMICS // AVCOAT ABLATION", key: "thermal" },
+            { s: "ECLSS // CABIN O2 RESERVES", key: "eclss" },
+            { s: "RS-25 CORE STAGE TELEMETRY", key: "engine" }
+        ];
+
+        for(let i=0; i<50; i++) {
+            let subj = textSubjects[Math.floor(Math.random()*textSubjects.length)];
+            dbSource.push({
+                id: `SYS-LOG-${Math.floor(Math.random()*90000)+10000}`,
+                b: agencies[Math.floor(Math.random()*agencies.length)],
+                s: subj.s, f: "JSC DATABASE",
+                c: "TS/SCI", img: -1, type: subj.key
+            });
+        }
+
+        // 3. SHUFFLE THE DATABASE PROPERLY
+        for (let i = dbSource.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [dbSource[i], dbSource[j]] = [dbSource[j], dbSource[i]];
+        }
+
+        function loadDatabase() {
+            const grid = document.getElementById('data-grid');
+            document.getElementById('asset-count').innerText = `TOTAL HISTORICAL ASSETS: ${dbSource.length}`;
+            
+            let html = '';
+            // Render ALL items so images aren't hidden
+            dbSource.forEach((data, index) => {
+                let cColor = data.c.includes('TS/SCI') ? 'var(--accent-red)' : 'var(--accent-gold)';
+                let content = data.img === -1 ? `<div class="text-doc-icon">DAT</div>` : `<img src="${imgPool[data.img]}" class="card-img" loading="lazy">`;
+                
+                html += `
+                <div class="card" onclick="openFile(${index})">
+                    <div class="card-img-container">
+                        ${content}
+                        <div class="overlay-badge">${data.b}</div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-row"><span class="meta-label">ID:</span> <span class="meta-value">${data.id}</span></div>
+                        <div class="meta-row"><span class="meta-label">SUBJ:</span> <span class="meta-value" style="font-size:8px;">${data.s}</span></div>
+                        <div class="meta-row"><span class="meta-label">CLASS:</span> <span class="meta-value" style="color:${cColor}">${data.c}</span></div>
+                    </div>
+                </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        // --- DYNAMIC RICH TEXT/BLUEPRINT GENERATOR ---
+        function getRealDataDump(type) {
+            const date = "APRIL 13, 2026";
+            let html = `<div style="border-bottom: 1px solid var(--accent-cyan); margin-bottom: 15px; padding-bottom: 10px;">
+                <h3 style="margin:0; color:var(--accent-blue); font-family:var(--font-sans); letter-spacing:1px;">--- CLASSIFIED TELEMETRY DUMP ---</h3>
+                <div style="color:var(--text-muted); font-size:11px; margin-top:5px;">NODE: DSN-GOLDSTONE-14 | DATE: ${date}</div>
+            </div>`;
+
+            if(type === 'orbit') {
+                html += `
+                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: LUNAR FREE-RETURN TRAJECTORY</div>
+                <div style="background:rgba(37, 99, 235, 0.1); padding: 10px; border-left: 3px solid var(--accent-blue); margin-bottom: 15px; font-size:11px;">
+                    <span style="color:var(--text-muted);">[ORBITAL MECHANICS]</span><br>
+                    > Vis-viva Eq: <span style="color:var(--accent-green);">v² = GM * (2/r - 1/a)</span><br>
+                    > Tsiolkovsky Eq: <span style="color:var(--accent-green);">Δv = I_sp * g_0 * ln(m_0 / m_f)</span>
+                </div>
+                <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
+                    <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>PARAMETER</th><th>RECORDED VALUE</th></tr>
+                    <tr><td style="padding:4px 0;">Distance (r)</td><td style="color:var(--accent-cyan);">413,142.05 km (Apolune)</td></tr>
+                    <tr><td style="padding:4px 0;">Semi-major Axis (a)</td><td>208,500.00 km</td></tr>
+                    <tr><td style="padding:4px 0;">Calculated Δv</td><td style="color:var(--accent-green);">8,985 m/s</td></tr>
+                </table>
+                <div style="font-size:10px; color:var(--accent-gold); margin-bottom:5px;">TRAJECTORY VISUALIZATION (TLI -> LUNAR FLYBY):</div>
+                <div style="font-family:monospace; white-space:pre; color:var(--accent-blue); background:#000; padding:15px; border:1px solid var(--panel-border); overflow-x:auto;">
+     EARTH [Z]                           MOON [M]
+      (O)  --→ → → → → → → → → → → → → → →   ( )
+         \\                           /
+          \\_ _ _ _ _ _ _ _ _ _ _ _ _/
+            RETURN TRAJECTORY V_r
+                </div>
+                <div style="margin-top:15px; color:var(--accent-green); font-weight:bold;">[STATUS] TRAJECTORY NOMINAL. LUNAR FLYBY SUCCESSFUL.</div>`;
+            } else if(type === 'thermal') {
+                html += `
+                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: ORION AVCOAT HEAT SHIELD ABLATION</div>
+                <div style="background:rgba(239, 68, 68, 0.1); padding: 10px; border-left: 3px solid var(--accent-red); margin-bottom: 15px; font-size:11px;">
+                    <span style="color:var(--text-muted);">[THERMODYNAMICS CALCULATION]</span><br>
+                    > Sutton-Graves Eq: <span style="color:var(--accent-red);">q_s = k * (ρ / R_N)^0.5 * v³</span><br>
+                    > Entry Velocity (v): Mach 32 (10,958 m/s)
+                </div>
+                <div style="font-size:10px; color:var(--text-muted); margin-bottom:5px;">THERMAL LOAD BAR GRAPH (ENTRY INTERFACE):</div>
+                <div style="background:#000; padding:10px; border:1px solid var(--panel-border); margin-bottom:15px; font-size:10px;">
+                    <div style="margin-bottom:6px;">EI+2m [1500°C]: <div style="height:6px; width:45%; background:var(--accent-gold); margin-top:2px;"></div></div>
+                    <div style="margin-bottom:6px;">EI+4m [2760°C]: <div style="height:6px; width:95%; background:var(--accent-red); margin-top:2px;"></div></div>
+                    <div style="margin-bottom:6px;">EI+6m [2500°C]: <div style="height:6px; width:85%; background:var(--accent-red); margin-top:2px;"></div></div>
+                    <div>EI+8m [1200°C]: <div style="height:6px; width:30%; background:var(--accent-gold); margin-top:2px;"></div></div>
+                </div>
+                <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
+                    <tr><td style="padding:4px 0;">Pre-Flight Thickness</td><td style="color:#fff;">4.10 cm</td></tr>
+                    <tr><td style="padding:4px 0;">Post-Flight Thickness</td><td style="color:var(--accent-red);">2.41 cm (41% Ablated)</td></tr>
+                </table>
+                <div style="color:var(--accent-green); font-weight:bold;">[STATUS] HULL INTEGRITY 99.8%. CREW SURVIVAL 100%.</div>`;
+            } else if(type === 'eclss') {
+                html += `
+                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: ECLSS LIFE SUPPORT SYSTEMS</div>
+                <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
+                    <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>SYSTEM COMPONENT</th><th>STATUS / METRIC</th></tr>
+                    <tr><td style="padding:6px 0;">Cabin Pressure</td><td style="color:var(--accent-cyan);">14.7 psi (101.3 kPa)</td></tr>
+                    <tr><td style="padding:6px 0;">Partial O2 (ppO2)</td><td style="color:var(--accent-cyan);">3.1 psi (21.4 kPa)</td></tr>
+                    <tr><td style="padding:6px 0;">Total O2 Consumed</td><td>33.6 kg (4 Crew / 10 Days)</td></tr>
+                    <tr><td style="padding:6px 0;">Amine Swingbed Eff.</td><td style="color:var(--accent-green);">98.7% (CO2 Scrubbing)</td></tr>
+                </table>
+                <div style="background:rgba(16, 185, 129, 0.1); padding: 10px; border-left: 3px solid var(--accent-green); font-size:11px;">
+                    <span style="color:var(--text-muted);">[CHEMICAL REACTION - SCRUBBER]</span><br>
+                    > <span style="color:#fff;">R-NH2 + CO2 + H2O <-> R-NH3+ + HCO3-</span>
+                </div>
+                <div style="margin-top:15px; color:var(--accent-green); font-weight:bold;">[STATUS] ECLSS NOMINAL THROUGH ENTIRE DURATION.</div>`;
+            } else {
+                html += `
+                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: RS-25 ENGINE ASCENT PROFILE</div>
+                <div style="background:rgba(245, 158, 11, 0.1); padding: 10px; border-left: 3px solid var(--accent-gold); margin-bottom: 15px; font-size:11px;">
+                    <span style="color:var(--text-muted);">[PROPULSION DATA AT MECO]</span><br>
+                    > Chamber Pressure: <span style="color:#fff;">3,008 psia (20.7 MPa)</span><br>
+                    > Mass Flow (LOX): <span style="color:var(--accent-cyan);">3,061 kg/s</span><br>
+                    > Mass Flow (LH2): <span style="color:var(--accent-cyan);">510 kg/s</span>
+                </div>
+                <div style="font-size:10px; color:var(--text-muted); margin-bottom:5px;">ENGINE THRUST OUTPUT LOG:</div>
+                <div style="background:#000; padding:15px; border:1px solid var(--panel-border); margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
+                        <span>E2047:</span>
+                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
+                        <span style="color:var(--accent-green);">109%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
+                        <span>E2059:</span>
+                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
+                        <span style="color:var(--accent-green);">109%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
+                        <span>E2062:</span>
+                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
+                        <span style="color:var(--accent-green);">109%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:10px;">
+                        <span>E2063:</span>
+                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
+                        <span style="color:var(--accent-green);">109%</span>
+                    </div>
+                </div>
+                <div style="color:var(--accent-green); font-weight:bold;">[STATUS] CORE STAGE SEPARATION CONFIRMED. SAFELY EXPENDED.</div>`;
+            }
+            return html;
+        }
+
+        function openFile(index) {
+            const data = dbSource[index];
+            const modal = document.getElementById('modal');
+            const overlay = document.getElementById('modal-overlay');
+            const progress = document.getElementById('progress-bar');
+            const text = document.getElementById('modal-text');
+            const hexDump = document.getElementById('hex-dump');
+            const fullViewer = document.getElementById('fullscreen-viewer');
+            const fullImg = document.getElementById('fullscreen-img');
+            const fullTextWrapper = document.getElementById('fullscreen-text-wrapper');
+            const fullText = document.getElementById('fullscreen-text');
+            
+            modal.style.display = 'block'; overlay.style.display = 'block';
+            progress.style.width = '0%'; text.innerText = "Extracting archived file from DSN Node...";
+            hexDump.innerHTML = "";
+            fullImg.style.display = 'none'; fullTextWrapper.style.display = 'none';
+
+            const hexInt = setInterval(() => {
+                let r = ""; for(let i=0; i<6; i++) r += Math.random().toString(16).substr(2, 8).toUpperCase() + " ";
+                hexDump.innerHTML = r + "<br>" + hexDump.innerHTML;
+            }, 60);
+
+            let w = 0;
+            const int = setInterval(() => {
+                w += Math.random() * 20;
+                if(w>40) text.innerText = "Verifying security clearance...";
+                if(w>=100) {
+                    w = 100; clearInterval(int); clearInterval(hexInt);
+                    text.innerText = "DECRYPTION SUCCESSFUL.";
+                    setTimeout(() => {
+                        modal.style.display = 'none'; overlay.style.display = 'none';
+                        fullViewer.style.display = 'flex';
+                        if(data.type === 'img') {
+                            fullImg.style.display = 'block';
+                            fullImg.src = imgPool[data.img];
+                        } else {
+                            fullTextWrapper.style.display = 'block';
+                            // Šeit mēs izmantojam innerHTML, lai renderētu krāsaino un strukturēto saturu
+                            fullText.innerHTML = getRealDataDump(data.type); 
+                        }
+                    }, 500);
+                }
+                progress.style.width = w + '%';
+            }, 60);
+        }
+
+        function closeViewer() {
+            document.getElementById('fullscreen-viewer').style.display = 'none';
+            document.getElementById('fullscreen-img').src = "";
+            document.getElementById('fullscreen-text').innerHTML = "";
+        }
+    </script>
+</body>
+</html>
