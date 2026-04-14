@@ -234,13 +234,20 @@
         .crew-role { color: var(--text-muted); font-size: 9px; margin-bottom: 4px;}
         .crew-stat { display: flex; justify-content: space-between; font-size: 9px;}
 
-        /* NEW: LEADERBOARD SECTION */
+        /* --- UPDATED: LEADERBOARD SECTION --- */
         .leaderboard-container {
-            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; border-radius: 4px;
-            display: flex; flex-direction: column; max-height: 280px; overflow: hidden;
+            background: var(--panel-bg); 
+            border: 1px solid var(--accent-gold); /* Padara tabulu ļoti pamanāmu */
+            padding: 15px; 
+            border-radius: 4px;
+            display: flex; flex-direction: column; 
+            max-height: 300px; 
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+            margin-bottom: 5px;
         }
         .leaderboard-header {
-            color: var(--accent-cyan); font-weight: bold; font-size: 12px; border-bottom: 1px solid var(--panel-border);
+            color: var(--accent-gold); font-weight: bold; font-size: 12px; border-bottom: 1px solid var(--panel-border);
             padding-bottom: 10px; margin-bottom: 10px; font-family: var(--font-sans); text-transform: uppercase;
             display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px;
         }
@@ -249,8 +256,10 @@
         .heatshield-table th { color: var(--text-muted); font-family: var(--font-sans); padding: 8px; border-bottom: 1px solid var(--panel-border); position: sticky; top: 0; background: var(--panel-bg); z-index: 2; white-space: nowrap;}
         .heatshield-table td { padding: 8px; border-bottom: 1px dotted rgba(100, 116, 140, 0.3); white-space: nowrap;}
         .heatshield-table tr:hover { background: rgba(37, 99, 235, 0.1); cursor: crosshair; }
+        
         .rank-badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-weight: bold;}
-        .rank-1 { color: var(--bg-base); background: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);}
+        .rank-1 { color: var(--bg-base); background: var(--accent-gold); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);} /* Pirmajai vietai zelts */
+        .rank-2 { color: var(--bg-base); background: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);} /* Tev īpašs zils akcents */
 
         /* Bottom: Image Grid */
         .db-header {
@@ -588,7 +597,6 @@
         function startMissionTimer() {
             const splashdownDate = new Date("April 10, 2026 14:00:00").getTime();
             
-            // Iestatam sākuma datumus Rīgas laikā
             document.getElementById('riga-date').innerText = getLatvianDateString();
             document.getElementById('log-date').innerText = getLatvianDateString();
             
@@ -603,7 +611,6 @@
                 
                 document.getElementById("splash-timer").innerHTML = `T+ AFTER SPLASHDOWN: ${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M ${seconds.toString().padStart(2, '0')}S`;
                 
-                // Atjaunojam reāllaika pulksteni Rīgas zonā
                 document.getElementById('riga-time-clock').innerText = getLatvianTimeString();
             }, 1000);
         }
@@ -637,7 +644,6 @@
                 initCharts(); 
                 startTerminal(); 
                 loadDatabase();
-                buildLeaderboard();
                 startMissionTimer();
             }, delay + 800);
         }
@@ -669,50 +675,55 @@
             ];
             setInterval(() => {
                 const msg = messages[Math.floor(Math.random() * messages.length)];
-                const time = getLatvianTimeString(); // Izmantojam Latvijas laiku!
+                const time = getLatvianTimeString();
                 const isSuccess = msg.includes("CONFIRMED") || msg.includes("SUCCESS");
                 const el = document.createElement('div'); el.className = 'log-entry';
                 el.innerHTML = `<span class="log-time">[${time}]</span> <span class="${isSuccess ? 'log-success' : ''}">${msg}</span>`;
                 logContent.appendChild(el); 
                 
-                // Uzlabota scroll loģika terminālim
                 termWrap.scrollTop = termWrap.scrollHeight;
             }, 2500);
         }
 
-        // --- LEADERBOARD DATA GENERATION ---
+        // --- LEADERBOARD DATA GENERATION (Reāli NASA/ESA inženieri un tu) ---
         function buildLeaderboard() {
             const tbody = document.querySelector("#leaderboard-table tbody");
             const players = [
+                { name: "HOWARD HU", team: "NASA / USA", id: "US-ORION-01", status: "CLEARED" }, 
                 { name: "MARTINS BERGSTEINS", team: "TEAM LATVIA", id: "LV-77X9-B", status: "PRIORITY ASSIGNED" },
+                { name: "CHARLIE BLACKWELL-THOMPSON", team: "NASA / USA", id: "US-LD-001", status: "CLEARED" },
+                { name: "PHILIPPE DELOO", team: "ESA / FRANCE", id: "FR-ESM-01", status: "CLEARED" },
+                { name: "JOHN HONEYCUTT", team: "NASA / USA", id: "US-SLS-01", status: "CLEARED" },
+                { name: "AMIT KSHATRIYA", team: "NASA / USA", id: "US-M2M-01", status: "PENDING REVIEW" },
                 { name: "SARAH JENKINS", team: "NASA / USA", id: "US-91A2-F", status: "CLEARED" },
                 { name: "YUKI TANAKA", team: "JAXA / JAPAN", id: "JP-33V8-X", status: "CLEARED" },
                 { name: "LUCAS SILVA", team: "AEB / BRAZIL", id: "BR-41C4-K", status: "CLEARED" },
-                { name: "AMARA DIALLO", team: "ESA / SENEGAL", id: "SN-99P1-M", status: "CLEARED" },
+                { name: "AMARA DIALLO", team: "ASA / SENEGAL", id: "SN-99P1-M", status: "CLEARED" },
                 { name: "HENRIK ODEGARD", team: "NOSA / NORWAY", id: "NO-22D7-E", status: "PENDING REVIEW" },
                 { name: "PRIYA PATEL", team: "UKSA / UK", id: "GB-66T3-L", status: "CLEARED" },
                 { name: "WEI CHEN", team: "CNSA / CHINA", id: "CN-88W9-Q", status: "RESTRICTED ACCESS" },
                 { name: "FRANCOIS DUBOIS", team: "CNES / FRANCE", id: "FR-55N2-Y", status: "CLEARED" },
                 { name: "MARIA GONZALES", team: "INTA / SPAIN", id: "ES-11Z5-H", status: "CLEARED" },
                 { name: "THOMAS VANCE", team: "CSA / CANADA", id: "CA-44R6-J", status: "CLEARED" },
-                { name: "AISHA RAHMAN", team: "UAESA / UAE", id: "AE-77M8-C", status: "PENDING REVIEW" },
-                { name: "DAVID MILLER", team: "ASA / AUSTRALIA", id: "AU-33G1-P", status: "CLEARED" },
-                { name: "SOFIA ROSSI", team: "ASI / ITALY", id: "IT-99F4-W", status: "CLEARED" },
                 { name: "LARS BECKER", team: "DLR / GERMANY", id: "DE-22B9-S", status: "CLEARED" },
-                { name: "EMMA NILSSON", team: "SNSA / SWEDEN", id: "SE-66K2-D", status: "CLEARED" },
-                { name: "JAKUB KOWALSKI", team: "POLSA / POLAND", id: "PL-88H7-V", status: "CLEARED" },
-                { name: "CHLOE SMITH", team: "NZSA / NEW ZEALAND", id: "NZ-55L3-R", status: "PENDING REVIEW" }
+                { name: "EMMA NILSSON", team: "SNSA / SWEDEN", id: "SE-66K2-D", status: "PENDING REVIEW" }
             ];
 
             let rowsHtml = '';
             players.forEach((p, index) => {
                 const rank = index + 1;
-                let rankClass = rank === 1 ? 'rank-badge rank-1' : 'rank-badge';
+                
+                // Īpašas krāsas un vizuālie efekti 1. un 2. vietai
+                let rankClass = 'rank-badge';
+                if(rank === 1) rankClass += ' rank-1';
+                if(rank === 2) rankClass += ' rank-2';
+
                 let statusColor = p.status === 'PRIORITY ASSIGNED' ? 'var(--accent-cyan)' : 
                                   p.status === 'CLEARED' ? 'var(--accent-green)' : 
                                   p.status === 'RESTRICTED ACCESS' ? 'var(--accent-red)' : 'var(--accent-gold)';
-                let nameColor = rank === 1 ? '#fff' : 'var(--text-main)';
-                let fw = rank === 1 ? 'bold' : 'normal';
+                
+                let nameColor = (rank === 1 || rank === 2) ? '#fff' : 'var(--text-main)';
+                let fw = (rank === 1 || rank === 2) ? 'bold' : 'normal';
 
                 rowsHtml += `
                     <tr>
@@ -726,6 +737,11 @@
             });
             tbody.innerHTML = rowsHtml;
         }
+
+        // IZSAUCAM UZREIZ, LAI TABULA GARANTĒTI IELĀDĒTOS (Pat pirms animācijas)
+        document.addEventListener("DOMContentLoaded", () => {
+            buildLeaderboard();
+        });
 
         // --- MASSIVE DATABASE GENERATION ---
         const imgPool = [
