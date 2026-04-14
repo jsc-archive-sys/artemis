@@ -136,6 +136,7 @@
         .sidebar-blueprint {
             width: 320px; background-color: var(--blueprint-bg); border-right: 1px solid var(--panel-border);
             padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0;
+            position: relative;
         }
 
         /* USER CREDENTIAL BOX */
@@ -146,7 +147,13 @@
         .user-avatar { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border: 1px solid var(--accent-cyan); display: flex; justify-content: center; align-items: center; font-size: 24px; color: var(--accent-cyan); }
         .user-info { font-size: 10px; line-height: 1.4; }
         .user-info strong { color: #fff; font-size: 12px; letter-spacing: 1px;}
-        .status-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 5px var(--accent-green); margin-right: 4px;}
+        .status-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 5px var(--accent-green); margin-right: 4px; animation: pulse 1.5s infinite;}
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
 
         .blueprint-header {
             color: var(--accent-cyan); font-weight: bold; font-size: 11px; border-bottom: 1px solid var(--panel-border);
@@ -177,6 +184,20 @@
         .p-stat { display: flex; justify-content: space-between; padding: 2px 0; color: #fff;}
         .p-stat span:first-child { color: var(--text-muted); }
 
+        /* DATA INTEGRITY WIDGET */
+        .integrity-box {
+            margin-top: auto; border: 1px solid var(--panel-border); background: #000; padding: 10px;
+        }
+        .integrity-title { font-size: 9px; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+        .integrity-bar { height: 4px; background: #222; width: 100%; margin-bottom: 5px; overflow: hidden; position: relative;}
+        .integrity-fill { height: 100%; background: var(--accent-blue); width: 85%; }
+        .integrity-fill::after {
+            content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: scan 2s infinite linear;
+        }
+        @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+
         /* CENTER: Complex Data Area */
         .content-area {
             flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
@@ -189,25 +210,47 @@
         .chart-title { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
         .chart-title span:last-child { color: var(--accent-cyan); }
 
-        .middle-section { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; min-height: 200px; }
+        .middle-section { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
         
         .terminal-log {
             background: #000; border: 1px solid var(--panel-border); border-left: 3px solid var(--accent-blue);
             padding: 15px; overflow-y: auto; font-size: 10px; color: var(--text-muted); display: flex; flex-direction: column; border-radius: 4px;
+            height: 220px; position: relative;
         }
         .log-entry { margin-bottom: 5px; line-height: 1.4;}
         .log-time { color: var(--accent-cyan); margin-right: 8px; opacity: 0.8;}
         .log-crit { color: var(--accent-red); font-weight: bold; }
         .log-success { color: var(--accent-green); }
+        .blinking-cursor { animation: blinker 1s linear infinite; color: var(--text-main); font-weight: bold;}
+        @keyframes blinker { 50% { opacity: 0; } }
 
         .crew-matrix {
             background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; font-size: 10px; overflow-y: auto; border-radius: 4px;
+            height: 220px;
         }
         .crew-header { color: #fff; font-weight: bold; border-bottom: 1px dashed var(--text-muted); margin-bottom: 10px; padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
         .crew-member { margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; border-left: 2px solid var(--accent-cyan);}
         .crew-name { color: #fff; font-weight: bold; font-size: 11px;}
         .crew-role { color: var(--text-muted); font-size: 9px; margin-bottom: 4px;}
         .crew-stat { display: flex; justify-content: space-between; font-size: 9px;}
+
+        /* NEW: LEADERBOARD SECTION */
+        .leaderboard-container {
+            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; border-radius: 4px;
+            display: flex; flex-direction: column; max-height: 280px; overflow: hidden;
+        }
+        .leaderboard-header {
+            color: var(--accent-cyan); font-weight: bold; font-size: 12px; border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px; margin-bottom: 10px; font-family: var(--font-sans); text-transform: uppercase;
+            display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px;
+        }
+        .table-wrapper { overflow-y: auto; overflow-x: auto; flex: 1; padding-right: 5px;}
+        .heatshield-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
+        .heatshield-table th { color: var(--text-muted); font-family: var(--font-sans); padding: 8px; border-bottom: 1px solid var(--panel-border); position: sticky; top: 0; background: var(--panel-bg); z-index: 2; white-space: nowrap;}
+        .heatshield-table td { padding: 8px; border-bottom: 1px dotted rgba(100, 116, 140, 0.3); white-space: nowrap;}
+        .heatshield-table tr:hover { background: rgba(37, 99, 235, 0.1); cursor: crosshair; }
+        .rank-badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-weight: bold;}
+        .rank-1 { color: var(--bg-base); background: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);}
 
         /* Bottom: Image Grid */
         .db-header {
@@ -261,8 +304,7 @@
         #fullscreen-text { color: var(--accent-green); font-family: var(--font-mono); text-align: left; width: 100%; height: 100%; overflow-y: auto; white-space: pre-wrap; font-size: 13px; background: #000; padding: 30px; line-height: 1.5; text-shadow: 0 0 3px var(--accent-green);}
 
         @media (max-width: 1024px) {
-            .middle-section { grid-template-columns: 1fr; height: auto;}
-            .crew-matrix { height: auto; }
+            .middle-section { grid-template-columns: 1fr; }
             .graphs-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
@@ -275,6 +317,8 @@
             .agency-logos { border-right: none; padding-right: 0; flex-wrap: wrap; justify-content: center;}
             .header-right { flex-direction: column; align-items: stretch;}
             .sys-date { text-align: center; border-right: none; padding-right: 0; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 5px;}
+            .terminal-log, .crew-matrix { height: 250px; }
+            .leaderboard-container { max-height: 350px; }
         }
     </style>
 </head>
@@ -326,7 +370,10 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="sys-date">SYS DATE: APR 13, 2026<br>STATUS: ARCHIVED</div>
+                <div class="sys-date">
+                    SYS DATE: <span id="riga-date">SYNCING...</span> | RIGA LOC: <span id="riga-time-clock">--:--:--</span><br>
+                    <span id="splash-timer" style="color: var(--accent-gold); font-size: 10px;"></span>
+                </div>
                 <div class="clearance">TS/SCI // EYES ONLY</div>
             </div>
         </header>
@@ -388,6 +435,15 @@
                     <div class="p-stat"><span>ENGINE E2047:</span> <span style="color:var(--accent-green)">109% (MAX)</span></div>
                     <div class="p-stat"><span>ENGINE E2059:</span> <span style="color:var(--accent-green)">109% (MAX)</span></div>
                 </div>
+
+                <div class="integrity-box">
+                    <div class="integrity-title">ARCHIVE DECRYPTION STATUS</div>
+                    <div class="integrity-bar"><div class="integrity-fill"></div></div>
+                    <div style="font-size:8px; color:var(--text-muted); display:flex; justify-content:space-between;">
+                        <span>BLOCKS: 4892/5104</span>
+                        <span style="color:var(--accent-blue)">SYNCING...</span>
+                    </div>
+                </div>
             </aside>
 
             <main class="content-area">
@@ -412,7 +468,11 @@
 
                 <div class="middle-section">
                     <div class="terminal-log" id="term-log">
-                        <div style="color:#fff; border-bottom:1px solid var(--panel-border); margin-bottom:10px; padding-bottom:5px; font-weight:bold;">POST-MISSION DECRYPTION LOG // APR 13, 2026</div>
+                        <div style="color:#fff; border-bottom:1px solid var(--panel-border); margin-bottom:10px; padding-bottom:5px; font-weight:bold;">
+                            POST-MISSION DECRYPTION LOG // <span id="log-date"></span>
+                        </div>
+                        <div id="log-content"></div>
+                        <div style="margin-top: 5px;"><span class="log-time">>[SYS]</span> AWAITING INPUT<span class="blinking-cursor">_</span></div>
                     </div>
                     
                     <div class="crew-matrix">
@@ -433,6 +493,28 @@
                             <div class="crew-name">HANSEN, JEREMY (CSA)</div><div class="crew-role">MISSION SPEC 2 (MS2)</div>
                             <div class="crew-stat"><span>POST-FLIGHT EVAL:</span> <span style="color:var(--accent-green)">CLEARED</span></div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-container">
+                    <div class="leaderboard-header">
+                        <span>HEATSHIELD TILE SELECTION: EVALUATION LEADERBOARD</span>
+                        <span style="color: var(--text-muted); font-size: 10px;">AUTHORIZED EYES ONLY</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="heatshield-table" id="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>RANK</th>
+                                    <th>ANALYST NAME</th>
+                                    <th>TEAM / REGION</th>
+                                    <th>AUTH ID</th>
+                                    <th>ASSIGNMENT STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -466,6 +548,19 @@
     </div>
 
     <script>
+        // --- HELPER FUNKCIJAS LATVIJAS LAIKAM ---
+        function getLatvianDateString() {
+            return new Date().toLocaleDateString('en-GB', {
+                timeZone: 'Europe/Riga', day: '2-digit', month: 'short', year: 'numeric'
+            }).toUpperCase();
+        }
+
+        function getLatvianTimeString() {
+            return new Date().toLocaleTimeString('en-GB', {
+                timeZone: 'Europe/Riga', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
         // --- ANTI-SNOOPING ---
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false; };
@@ -489,6 +584,30 @@
             if (e.key === 'Enter') verifyLogin();
         });
 
+        // --- MISSION TIMER (AUTHENTICITY TOUCH & LOCAL TIME) ---
+        function startMissionTimer() {
+            const splashdownDate = new Date("April 10, 2026 14:00:00").getTime();
+            
+            // Iestatam sākuma datumus Rīgas laikā
+            document.getElementById('riga-date').innerText = getLatvianDateString();
+            document.getElementById('log-date').innerText = getLatvianDateString();
+            
+            setInterval(() => {
+                const now = new Date().getTime();
+                const distance = now - splashdownDate;
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById("splash-timer").innerHTML = `T+ AFTER SPLASHDOWN: ${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M ${seconds.toString().padStart(2, '0')}S`;
+                
+                // Atjaunojam reāllaika pulksteni Rīgas zonā
+                document.getElementById('riga-time-clock').innerText = getLatvianTimeString();
+            }, 1000);
+        }
+
         // --- BOOT SEQUENCE ---
         function startBootSequence() {
             const bootScreen = document.getElementById('boot-screen');
@@ -496,7 +615,7 @@
             const bootText = [
                 "ESTABLISHING SECURE CONNECTION TO JSC DATABASE...", 
                 "VERIFYING PIV CERTIFICATE: CMDR. VICTORIA [ACCEPTED]...",
-                "SYNCING TIMESTAMPS: CURRENT DATE APR 13, 2026...",
+                `SYNCING TIMESTAMPS: CURRENT DATE ${getLatvianDateString()}...`,
                 "LOADING SLS BLOCK 1 POST-FLIGHT MATRICES...", 
                 "BYPASSING NSA FIREWALL RULE 40-B...",
                 "DECRYPTING MISSION ASSET ARCHIVE...", 
@@ -515,7 +634,11 @@
             setTimeout(() => { 
                 bootScreen.style.display = 'none'; 
                 document.getElementById('main-ui').style.display = 'flex'; 
-                initCharts(); startTerminal(); loadDatabase();
+                initCharts(); 
+                startTerminal(); 
+                loadDatabase();
+                buildLeaderboard();
+                startMissionTimer();
             }, delay + 800);
         }
 
@@ -533,23 +656,75 @@
 
         // --- TERMINAL LOG GENERATOR ---
         function startTerminal() {
-            const term = document.getElementById('term-log');
+            const logContent = document.getElementById('log-content');
+            const termWrap = document.getElementById('term-log');
             const messages = [ 
                 "SYNCING DATA WITH USS JOHN P. MURTHA...", 
                 "VERIFYING CHECKSUM: E2047_TELEMETRY.dat", 
-                "EXTRACTING ORION CABIN AUDIO (APR 2026 ARCHIVE)...", 
+                "EXTRACTING ORION CABIN AUDIO...", 
                 "PARSING HISTORICAL FLIGHT DYNAMICS LOGS...", 
                 "CM SEPARATION PYRO SEQUENCE CONFIRMED.",
-                "UPLINKING FINAL REPORT TO PENTAGON SERVER..."
+                "UPLINKING FINAL REPORT TO PENTAGON SERVER...",
+                "RUNNING BACKGROUND DECRYPTION [BLOCK 4892]..."
             ];
             setInterval(() => {
                 const msg = messages[Math.floor(Math.random() * messages.length)];
-                const time = new Date().toISOString().substring(11, 19);
+                const time = getLatvianTimeString(); // Izmantojam Latvijas laiku!
                 const isSuccess = msg.includes("CONFIRMED") || msg.includes("SUCCESS");
                 const el = document.createElement('div'); el.className = 'log-entry';
                 el.innerHTML = `<span class="log-time">[${time}]</span> <span class="${isSuccess ? 'log-success' : ''}">${msg}</span>`;
-                term.appendChild(el); term.scrollTop = term.scrollHeight;
+                logContent.appendChild(el); 
+                
+                // Uzlabota scroll loģika terminālim
+                termWrap.scrollTop = termWrap.scrollHeight;
             }, 2500);
+        }
+
+        // --- LEADERBOARD DATA GENERATION ---
+        function buildLeaderboard() {
+            const tbody = document.querySelector("#leaderboard-table tbody");
+            const players = [
+                { name: "MARTINS BERGSTEINS", team: "TEAM LATVIA", id: "LV-77X9-B", status: "PRIORITY ASSIGNED" },
+                { name: "SARAH JENKINS", team: "NASA / USA", id: "US-91A2-F", status: "CLEARED" },
+                { name: "YUKI TANAKA", team: "JAXA / JAPAN", id: "JP-33V8-X", status: "CLEARED" },
+                { name: "LUCAS SILVA", team: "AEB / BRAZIL", id: "BR-41C4-K", status: "CLEARED" },
+                { name: "AMARA DIALLO", team: "ESA / SENEGAL", id: "SN-99P1-M", status: "CLEARED" },
+                { name: "HENRIK ODEGARD", team: "NOSA / NORWAY", id: "NO-22D7-E", status: "PENDING REVIEW" },
+                { name: "PRIYA PATEL", team: "UKSA / UK", id: "GB-66T3-L", status: "CLEARED" },
+                { name: "WEI CHEN", team: "CNSA / CHINA", id: "CN-88W9-Q", status: "RESTRICTED ACCESS" },
+                { name: "FRANCOIS DUBOIS", team: "CNES / FRANCE", id: "FR-55N2-Y", status: "CLEARED" },
+                { name: "MARIA GONZALES", team: "INTA / SPAIN", id: "ES-11Z5-H", status: "CLEARED" },
+                { name: "THOMAS VANCE", team: "CSA / CANADA", id: "CA-44R6-J", status: "CLEARED" },
+                { name: "AISHA RAHMAN", team: "UAESA / UAE", id: "AE-77M8-C", status: "PENDING REVIEW" },
+                { name: "DAVID MILLER", team: "ASA / AUSTRALIA", id: "AU-33G1-P", status: "CLEARED" },
+                { name: "SOFIA ROSSI", team: "ASI / ITALY", id: "IT-99F4-W", status: "CLEARED" },
+                { name: "LARS BECKER", team: "DLR / GERMANY", id: "DE-22B9-S", status: "CLEARED" },
+                { name: "EMMA NILSSON", team: "SNSA / SWEDEN", id: "SE-66K2-D", status: "CLEARED" },
+                { name: "JAKUB KOWALSKI", team: "POLSA / POLAND", id: "PL-88H7-V", status: "CLEARED" },
+                { name: "CHLOE SMITH", team: "NZSA / NEW ZEALAND", id: "NZ-55L3-R", status: "PENDING REVIEW" }
+            ];
+
+            let rowsHtml = '';
+            players.forEach((p, index) => {
+                const rank = index + 1;
+                let rankClass = rank === 1 ? 'rank-badge rank-1' : 'rank-badge';
+                let statusColor = p.status === 'PRIORITY ASSIGNED' ? 'var(--accent-cyan)' : 
+                                  p.status === 'CLEARED' ? 'var(--accent-green)' : 
+                                  p.status === 'RESTRICTED ACCESS' ? 'var(--accent-red)' : 'var(--accent-gold)';
+                let nameColor = rank === 1 ? '#fff' : 'var(--text-main)';
+                let fw = rank === 1 ? 'bold' : 'normal';
+
+                rowsHtml += `
+                    <tr>
+                        <td><span class="${rankClass}">0${rank.toString().padStart(2, '0')}</span></td>
+                        <td style="color:${nameColor}; font-weight:${fw};">${p.name}</td>
+                        <td style="color:var(--text-muted);">${p.team}</td>
+                        <td style="font-family:var(--font-mono); color:var(--accent-blue);">${p.id}</td>
+                        <td style="color:${statusColor}; font-weight:bold;">${p.status}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = rowsHtml;
         }
 
         // --- MASSIVE DATABASE GENERATION ---
@@ -575,19 +750,15 @@
         let dbSource = [];
         const agencies = ["NASA // FIDO", "DOD // JTF", "NRO // SIGINT", "USSF // RADAR", "ESA // ESM OPS"];
         
-        // 1. ADD ALL IMAGES FIRST
         for(let i=0; i<imgPool.length; i++) {
             dbSource.push({
                 id: `OPT-${Math.floor(Math.random()*9000)+1000}-A`,
                 b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: "CLASSIFIED OPTICAL ARCHIVE",
-                f: "DEEP SPACE NETWORK",
-                c: Math.random() > 0.5 ? "TS/SCI" : "SECRET",
-                img: i, type: 'img'
+                s: "CLASSIFIED OPTICAL ARCHIVE", f: "DEEP SPACE NETWORK",
+                c: Math.random() > 0.5 ? "TS/SCI" : "SECRET", img: i, type: 'img'
             });
         }
 
-        // 2. ADD TECHNICAL DATA FILES
         const textSubjects = [
             { s: "ORBITAL DYNAMICS // TLI VECTORS", key: "orbit" },
             { s: "THERMODYNAMICS // AVCOAT ABLATION", key: "thermal" },
@@ -595,17 +766,15 @@
             { s: "RS-25 CORE STAGE TELEMETRY", key: "engine" }
         ];
 
-        for(let i=0; i<50; i++) {
+        for(let i=0; i<12; i++) {
             let subj = textSubjects[Math.floor(Math.random()*textSubjects.length)];
             dbSource.push({
                 id: `SYS-LOG-${Math.floor(Math.random()*90000)+10000}`,
                 b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: subj.s, f: "JSC DATABASE",
-                c: "TS/SCI", img: -1, type: subj.key
+                s: subj.s, f: "JSC DATABASE", c: "TS/SCI", img: -1, type: subj.key
             });
         }
 
-        // 3. SHUFFLE THE DATABASE PROPERLY
         for (let i = dbSource.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [dbSource[i], dbSource[j]] = [dbSource[j], dbSource[i]];
@@ -616,7 +785,6 @@
             document.getElementById('asset-count').innerText = `TOTAL HISTORICAL ASSETS: ${dbSource.length}`;
             
             let html = '';
-            // Render ALL items so images aren't hidden
             dbSource.forEach((data, index) => {
                 let cColor = data.c.includes('TS/SCI') ? 'var(--accent-red)' : 'var(--accent-gold)';
                 let content = data.img === -1 ? `<div class="text-doc-icon">DAT</div>` : `<img src="${imgPool[data.img]}" class="card-img" loading="lazy">`;
@@ -639,7 +807,7 @@
 
         // --- DYNAMIC RICH TEXT/BLUEPRINT GENERATOR ---
         function getRealDataDump(type) {
-            const date = "APRIL 13, 2026";
+            const date = getLatvianDateString();
             let html = `<div style="border-bottom: 1px solid var(--accent-cyan); margin-bottom: 15px; padding-bottom: 10px;">
                 <h3 style="margin:0; color:var(--accent-blue); font-family:var(--font-sans); letter-spacing:1px;">--- CLASSIFIED TELEMETRY DUMP ---</h3>
                 <div style="color:var(--text-muted); font-size:11px; margin-top:5px;">NODE: DSN-GOLDSTONE-14 | DATE: ${date}</div>
@@ -777,7 +945,6 @@
                             fullImg.src = imgPool[data.img];
                         } else {
                             fullTextWrapper.style.display = 'block';
-                            // Šeit mēs izmantojam innerHTML, lai renderētu krāsaino un strukturēto saturu
                             fullText.innerHTML = getRealDataDump(data.type); 
                         }
                     }, 500);
