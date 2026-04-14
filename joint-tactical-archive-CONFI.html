@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NASA | TS/SCI/JTA</title>
+    <title>NASA | TS/SCI/JTA | ARTEMIS II</title>
     <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -39,13 +39,14 @@
         ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 0; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
 
+        /* CRT Scanline Effect */
         body::after {
             content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
-            z-index: 9999; background-size: 100% 3px; pointer-events: none; opacity: 0.5;
+            z-index: 9999; background-size: 100% 3px; pointer-events: none; opacity: 0.4;
         }
 
-        /* --- LOGIN SCREEN (NASA THEME) --- */
+        /* --- LOGIN SCREEN --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://images-assets.nasa.gov/image/ARTEMIS-I_LIFTOFF/ARTEMIS-I_LIFTOFF~orig.jpg') no-repeat center center;
@@ -106,9 +107,9 @@
 
         /* --- HEADER AREA --- */
         header {
-            background-color: var(--panel-bg); border-bottom: 2px solid var(--accent-blue);
+            background-color: var(--panel-bg); border-bottom: 1px solid var(--panel-border);
             padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
-            z-index: 10; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); flex-wrap: wrap; gap: 10px;
+            z-index: 10; flex-wrap: wrap; gap: 10px;
         }
         .logo-area { display: flex; align-items: center; gap: 15px; flex-wrap: wrap;}
         
@@ -129,6 +130,18 @@
             text-align: center; white-space: nowrap; font-family: var(--font-sans);
         }
 
+        /* LIVE TELEMETRY TICKER */
+        .telemetry-ticker {
+            background: #000; border-bottom: 2px solid var(--accent-blue);
+            color: var(--accent-cyan); font-size: 10px; padding: 4px 10px;
+            display: flex; overflow: hidden; white-space: nowrap; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 9; font-weight: bold; letter-spacing: 1px;
+        }
+        .ticker-content { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+        .t-val { color: #fff; margin-right: 20px; font-weight: normal;}
+        .t-warn { color: var(--accent-gold); margin-right: 20px;}
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
         /* --- MAIN DASHBOARD LAYOUT --- */
         .main-container { display: flex; flex: 1; overflow: hidden; flex-direction: row; }
 
@@ -139,43 +152,27 @@
             position: relative;
         }
 
-        /* USER CREDENTIAL BOX */
-        .user-profile {
-            border: 1px solid var(--accent-cyan); background: rgba(6, 182, 212, 0.05); padding: 10px;
-            display: flex; gap: 15px; align-items: center;
-        }
+        .user-profile { border: 1px solid var(--accent-cyan); background: rgba(6, 182, 212, 0.05); padding: 10px; display: flex; gap: 15px; align-items: center; }
         .user-avatar { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border: 1px solid var(--accent-cyan); display: flex; justify-content: center; align-items: center; font-size: 24px; color: var(--accent-cyan); }
         .user-info { font-size: 10px; line-height: 1.4; }
         .user-info strong { color: #fff; font-size: 12px; letter-spacing: 1px;}
         .status-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 5px var(--accent-green); margin-right: 4px; animation: pulse 1.5s infinite;}
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        .blueprint-header {
-            color: var(--accent-cyan); font-weight: bold; font-size: 11px; border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 5px; text-align: center; letter-spacing: 1px; font-family: var(--font-sans); text-transform: uppercase;
-        }
+        .blueprint-header { color: var(--accent-cyan); font-weight: bold; font-size: 11px; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; text-align: center; letter-spacing: 1px; font-family: var(--font-sans); text-transform: uppercase; margin-bottom: 5px;}
         
         .rocket-stack-wrapper { width: 100%; display: flex; justify-content: center; }
         .rocket-stack { display: flex; flex-direction: column; align-items: center; width: 120px; position: relative; margin-bottom: 10px; }
-        
         .shape { border: 1px solid var(--blueprint-blue); background: rgba(59, 130, 246, 0.1); position: relative; display: flex; justify-content: center; align-items: center; }
-        
         .stage-las { width: 6px; height: 35px; background: transparent; border: none; border-bottom: 35px solid rgba(59, 130, 246, 0.5); border-left: 4px solid transparent; border-right: 4px solid transparent; margin-bottom: -1px; }
         .stage-cm { width: 40px; height: 25px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); margin-bottom: 2px; border-bottom: 1px solid var(--blueprint-blue); }
         .stage-esm { width: 40px; height: 40px; margin-bottom: 2px; }
         .stage-lvsa { width: 70px; height: 35px; clip-path: polygon(28% 0%, 72% 0%, 100% 100%, 0% 100%); margin-bottom: 2px; border: none; background: rgba(59, 130, 246, 0.2); }
         .stage-core { width: 70px; height: 260px; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;}
-        
         .srb { position: absolute; width: 16px; height: 290px; border: 1px solid var(--blueprint-blue); background: rgba(59, 130, 246, 0.15); top: 110px; z-index: 1;}
         .srb-left { left: -10px; border-radius: 50px 50px 0 0; }
         .srb-right { right: -10px; border-radius: 50px 50px 0 0; }
         .srb-nozzle { position: absolute; bottom: -10px; width: 10px; left: 2px; height: 10px; border-bottom: 10px solid var(--blueprint-blue); border-left: 3px solid transparent; border-right: 3px solid transparent; opacity: 0.7;}
-        
         .engine-sec { position: absolute; bottom: -12px; width: 60px; display: flex; justify-content: space-around; }
         .rs25 { width: 12px; height: 12px; border-bottom: 12px solid var(--accent-cyan); border-left: 3px solid transparent; border-right: 3px solid transparent; opacity: 0.8;}
 
@@ -184,39 +181,46 @@
         .p-stat { display: flex; justify-content: space-between; padding: 2px 0; color: #fff;}
         .p-stat span:first-child { color: var(--text-muted); }
 
-        /* DATA INTEGRITY WIDGET */
-        .integrity-box {
-            margin-top: auto; border: 1px solid var(--panel-border); background: #000; padding: 10px;
-        }
+        .dsn-grid { display: flex; flex-direction: column; gap: 8px; }
+        .dsn-node { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); padding: 8px 10px; border-radius: 4px; position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .dsn-node::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--text-muted); }
+        .dsn-node.active-link::before { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        .dsn-dish-icon { margin-right: 12px; display: flex; align-items: center; opacity: 0.7; }
+        .dsn-node.active-link .dsn-dish-icon { opacity: 1; stroke: var(--accent-cyan); }
+        .dsn-info { flex: 1; display: flex; flex-direction: column; justify-content: center;}
+        .dsn-info strong { color: #fff; font-size: 10px; font-family: var(--font-sans); letter-spacing: 1px; }
+        .dsn-loc { font-size: 8px; color: var(--text-muted); margin-bottom: 4px; }
+        .dsn-signals { display: flex; gap: 12px; font-size: 9px; font-weight: bold; font-family: var(--font-mono);}
+        .uplink { color: var(--accent-gold); display: flex; align-items: center; gap: 4px; }
+        .downlink { color: var(--accent-cyan); display: flex; align-items: center; gap: 4px; }
+        .anim-up { animation: floatUp 0.8s infinite alternate; display: inline-block; }
+        .anim-down { animation: floatDown 0.8s infinite alternate; display: inline-block; }
+        @keyframes floatUp { 0% { transform: translateY(1px); opacity: 0.4; } 100% { transform: translateY(-2px); opacity: 1; } }
+        @keyframes floatDown { 0% { transform: translateY(-1px); opacity: 0.4; } 100% { transform: translateY(2px); opacity: 1; } }
+        .pulse-status { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); margin-left: 10px; box-shadow: 0 0 8px var(--accent-green); animation: pulse 1.5s infinite; flex-shrink: 0; }
+        .pulse-standby { background: var(--text-muted); box-shadow: none; animation: none; opacity: 0.5; }
+
+        .integrity-box { margin-top: auto; border: 1px solid var(--panel-border); background: #000; padding: 10px; }
         .integrity-title { font-size: 9px; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
         .integrity-bar { height: 4px; background: #222; width: 100%; margin-bottom: 5px; overflow: hidden; position: relative;}
         .integrity-fill { height: 100%; background: var(--accent-blue); width: 85%; }
-        .integrity-fill::after {
-            content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: scan 2s infinite linear;
-        }
+        .integrity-fill::after { content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: scan 2s infinite linear; }
         @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
 
         /* CENTER: Complex Data Area */
-        .content-area {
-            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
-        }
+        .content-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        .graphs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .chart-box {
-            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; position: relative; height: 220px; border-radius: 4px;
-        }
-        .chart-title { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
+        /* UPGRADED GRAPHS GRID (3x2 for 6 charts) */
+        .graphs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        
+        .chart-box { background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 10px; position: relative; height: 240px; border-radius: 4px; display: flex; flex-direction: column; }
+        .chart-title { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; display: flex; justify-content: space-between; border-bottom: 1px dotted var(--panel-border); padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
         .chart-title span:last-child { color: var(--accent-cyan); }
+        .chart-container { flex: 1; position: relative; width: 100%; height: 100%; }
 
         .middle-section { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
         
-        .terminal-log {
-            background: #000; border: 1px solid var(--panel-border); border-left: 3px solid var(--accent-blue);
-            padding: 15px; overflow-y: auto; font-size: 10px; color: var(--text-muted); display: flex; flex-direction: column; border-radius: 4px;
-            height: 220px; position: relative;
-        }
+        .terminal-log { background: #000; border: 1px solid var(--panel-border); border-left: 3px solid var(--accent-blue); padding: 15px; overflow-y: auto; font-size: 10px; color: var(--text-muted); display: flex; flex-direction: column; border-radius: 4px; height: 220px; position: relative; }
         .log-entry { margin-bottom: 5px; line-height: 1.4;}
         .log-time { color: var(--accent-cyan); margin-right: 8px; opacity: 0.8;}
         .log-crit { color: var(--accent-red); font-weight: bold; }
@@ -224,65 +228,34 @@
         .blinking-cursor { animation: blinker 1s linear infinite; color: var(--text-main); font-weight: bold;}
         @keyframes blinker { 50% { opacity: 0; } }
 
-        .crew-matrix {
-            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; font-size: 10px; overflow-y: auto; border-radius: 4px;
-            height: 220px;
-        }
+        .crew-matrix { background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 15px; font-size: 10px; overflow-y: auto; border-radius: 4px; height: 220px; }
         .crew-header { color: #fff; font-weight: bold; border-bottom: 1px dashed var(--text-muted); margin-bottom: 10px; padding-bottom: 5px; font-family: var(--font-sans); text-transform: uppercase;}
         .crew-member { margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; border-left: 2px solid var(--accent-cyan);}
         .crew-name { color: #fff; font-weight: bold; font-size: 11px;}
         .crew-role { color: var(--text-muted); font-size: 9px; margin-bottom: 4px;}
         .crew-stat { display: flex; justify-content: space-between; font-size: 9px;}
 
-        /* --- UPDATED: LEADERBOARD SECTION --- */
-        .leaderboard-container {
-            background: var(--panel-bg); 
-            border: 1px solid var(--accent-gold); /* Padara tabulu ļoti pamanāmu */
-            padding: 15px; 
-            border-radius: 4px;
-            display: flex; flex-direction: column; 
-            max-height: 300px; 
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
-            margin-bottom: 5px;
-        }
-        .leaderboard-header {
-            color: var(--accent-gold); font-weight: bold; font-size: 12px; border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 10px; margin-bottom: 10px; font-family: var(--font-sans); text-transform: uppercase;
-            display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px;
-        }
+        .leaderboard-container { background: var(--panel-bg); border: 1px solid var(--accent-gold); padding: 15px; border-radius: 4px; display: flex; flex-direction: column; max-height: 300px; overflow: hidden; box-shadow: 0 0 15px rgba(245, 158, 11, 0.1); margin-bottom: 5px; }
+        .leaderboard-header { color: var(--accent-gold); font-weight: bold; font-size: 12px; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 10px; font-family: var(--font-sans); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
         .table-wrapper { overflow-y: auto; overflow-x: auto; flex: 1; padding-right: 5px;}
         .heatshield-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
         .heatshield-table th { color: var(--text-muted); font-family: var(--font-sans); padding: 8px; border-bottom: 1px solid var(--panel-border); position: sticky; top: 0; background: var(--panel-bg); z-index: 2; white-space: nowrap;}
         .heatshield-table td { padding: 8px; border-bottom: 1px dotted rgba(100, 116, 140, 0.3); white-space: nowrap;}
         .heatshield-table tr:hover { background: rgba(37, 99, 235, 0.1); cursor: crosshair; }
-        
         .rank-badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-weight: bold;}
-        .rank-1 { color: var(--bg-base); background: var(--accent-gold); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);} /* Pirmajai vietai zelts */
-        .rank-2 { color: var(--bg-base); background: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);} /* Tev īpašs zils akcents */
+        .rank-1 { color: var(--bg-base); background: var(--accent-gold); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);} 
+        .rank-2 { color: var(--bg-base); background: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);} 
 
         /* Bottom: Image Grid */
-        .db-header {
-            font-size: 12px; color: #fff; border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 10px; margin-top: 10px; display: flex; justify-content: space-between; font-weight: bold; letter-spacing: 1px; font-family: var(--font-sans);
-        }
+        .db-header { font-size: 12px; color: #fff; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-top: 10px; display: flex; justify-content: space-between; font-weight: bold; letter-spacing: 1px; font-family: var(--font-sans); }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; padding-bottom: 40px; }
-        .card {
-            background-color: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 4px;
-            cursor: pointer; position: relative; transition: all 0.2s; display: flex; flex-direction: column; overflow: hidden;
-        }
+        .card { background-color: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 4px; cursor: pointer; position: relative; transition: all 0.2s; display: flex; flex-direction: column; overflow: hidden; }
         .card:hover { border-color: var(--accent-blue); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2); transform: translateY(-2px); z-index: 5;}
         .card-img-container { position: relative; height: 140px; background: #000; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid var(--panel-border);}
-        .card-img {
-            width: 100%; height: 100%; object-fit: cover;
-            filter: grayscale(80%) sepia(10%) hue-rotate(180deg) brightness(0.7); transition: all 0.4s;
-        }
+        .card-img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(80%) sepia(10%) hue-rotate(180deg) brightness(0.7); transition: all 0.4s; }
         .card:hover .card-img { filter: grayscale(0%) brightness(1); }
         .text-doc-icon { font-size: 30px; color: var(--accent-blue); font-family: var(--font-sans); font-weight: bold;}
-        .overlay-badge {
-            position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8);
-            color: #fff; font-size: 9px; padding: 4px 8px; border: 1px solid var(--accent-blue); border-radius: 2px;
-        }
+        .overlay-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; padding: 4px 8px; border: 1px solid var(--accent-blue); border-radius: 2px; }
         .card-meta { padding: 12px; font-size: 9px; line-height: 1.5; flex: 1; display: flex; flex-direction: column; justify-content: center;}
         .meta-row { display: flex; justify-content: space-between; border-bottom: 1px dotted rgba(100, 116, 140, 0.3); padding: 4px 0; }
         .meta-row:last-child { border-bottom: none; }
@@ -291,31 +264,15 @@
 
         /* --- MODALS --- */
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(1, 4, 9, 0.95); z-index: 100; backdrop-filter: blur(5px);}
-        #modal {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background-color: var(--panel-bg); border: 1px solid var(--accent-blue); padding: 30px; z-index: 101; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px rgba(37, 99, 235, 0.3); border-radius: 4px;
-        }
-        #fullscreen-viewer {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 200; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; padding: 20px; box-sizing: border-box;
-        }
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: var(--panel-bg); border: 1px solid var(--accent-blue); padding: 30px; z-index: 101; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px rgba(37, 99, 235, 0.3); border-radius: 4px; }
+        #fullscreen-viewer { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 200; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; padding: 20px; box-sizing: border-box; }
         #fullscreen-img { max-width: 100%; max-height: 85%; border: 1px solid var(--accent-blue); box-shadow: 0 0 30px rgba(0,0,0,0.5); object-fit: contain; display: none; border-radius: 4px;}
-        
-        /* TEXT VIEWER WITH CRT SCANLINES */
-        #fullscreen-text-wrapper {
-            position: relative; max-width: 800px; width: 100%; height: 80%; display: none;
-            border: 1px solid var(--accent-cyan); box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
-        }
-        #fullscreen-text-wrapper::after {
-            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px; pointer-events: none; z-index: 10;
-        }
+        #fullscreen-text-wrapper { position: relative; max-width: 800px; width: 100%; height: 80%; display: none; border: 1px solid var(--accent-cyan); box-shadow: 0 0 30px rgba(6, 182, 212, 0.2); }
+        #fullscreen-text-wrapper::after { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%); background-size: 100% 4px; pointer-events: none; z-index: 10; }
         #fullscreen-text { color: var(--accent-green); font-family: var(--font-mono); text-align: left; width: 100%; height: 100%; overflow-y: auto; white-space: pre-wrap; font-size: 13px; background: #000; padding: 30px; line-height: 1.5; text-shadow: 0 0 3px var(--accent-green);}
 
-        @media (max-width: 1024px) {
-            .middle-section { grid-template-columns: 1fr; }
-            .graphs-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 1400px) { .graphs-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1024px) { .middle-section { grid-template-columns: 1fr; } .graphs-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             body, html { height: auto; overflow: visible; }
             .main-container { flex-direction: column; height: auto; overflow: visible; }
@@ -329,46 +286,6 @@
             .terminal-log, .crew-matrix { height: 250px; }
             .leaderboard-container { max-height: 350px; }
         }
-
-                /* --- DSN NETWORK STYLES --- */
-        .dsn-grid { display: flex; flex-direction: column; gap: 8px; }
-        .dsn-node { 
-            display: flex; align-items: center; background: rgba(0,0,0,0.4); 
-            border: 1px solid var(--panel-border); padding: 8px 10px; border-radius: 4px;
-            position: relative; overflow: hidden; transition: all 0.3s ease;
-        }
-        .dsn-node::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-            background: var(--text-muted); transition: background 0.3s;
-        }
-        .dsn-node.active-link::before { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
-        .dsn-dish-icon { margin-right: 12px; display: flex; align-items: center; opacity: 0.7; }
-        .dsn-node.active-link .dsn-dish-icon { opacity: 1; stroke: var(--accent-cyan); }
-        
-        .dsn-info { flex: 1; display: flex; flex-direction: column; justify-content: center;}
-        .dsn-info strong { color: #fff; font-size: 10px; font-family: var(--font-sans); letter-spacing: 1px; }
-        .dsn-loc { font-size: 8px; color: var(--text-muted); margin-bottom: 4px; }
-        
-        .dsn-signals { display: flex; gap: 12px; font-size: 9px; font-weight: bold; font-family: var(--font-mono);}
-        .uplink { color: var(--accent-gold); display: flex; align-items: center; gap: 4px; }
-        .downlink { color: var(--accent-cyan); display: flex; align-items: center; gap: 4px; }
-        
-        /* Signal Animations */
-        .anim-up { animation: floatUp 0.8s infinite alternate; display: inline-block; }
-        .anim-down { animation: floatDown 0.8s infinite alternate; display: inline-block; }
-        
-        @keyframes floatUp { 0% { transform: translateY(1px); opacity: 0.4; } 100% { transform: translateY(-2px); opacity: 1; } }
-        @keyframes floatDown { 0% { transform: translateY(-1px); opacity: 0.4; } 100% { transform: translateY(2px); opacity: 1; } }
-
-        /* Status Dot */
-        .pulse-status { 
-            width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); 
-            margin-left: 10px; box-shadow: 0 0 8px var(--accent-green); 
-            animation: dsnPulse 1.5s infinite; flex-shrink: 0;
-        }
-        .pulse-standby { background: var(--text-muted); box-shadow: none; animation: none; opacity: 0.5; }
-        
-        @keyframes dsnPulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -427,6 +344,26 @@
             </div>
         </header>
 
+        <div class="telemetry-ticker">
+            <div class="ticker-content">
+                SYS_STAT: <span class="t-val">NOMINAL</span> 
+                ORION_CM: <span class="t-val">RECOVERED</span> 
+                ESM_PYRO: <span class="t-val">0x8F2A CONFIRMED</span> 
+                RAD_DOSIMETRY: <span class="t-val">WITHIN LIMITS</span> 
+                DSN_LINK_GDS: <span class="t-val">12.4 kbps</span> 
+                DSN_LINK_MDS: <span class="t-val">8.2 kbps</span> 
+                DSN_LINK_CDS: <span class="t-warn">STANDBY</span> 
+                RS25_E2047: <span class="t-val">MECO +08:04</span> 
+                AVCOAT_ABLATION: <span class="t-warn">41.2% MAX DEVIATION</span> 
+                CABIN_PPO2: <span class="t-val">3.1 PSI</span> 
+                SYS_CORE_TEMP: <span class="t-val">42.1C</span> 
+                HEX_DUMP: <span class="t-val">0xA9 0xFF 0x1B 0x4C 0x00 0x8D</span>
+                SYS_STAT: <span class="t-val">NOMINAL</span> 
+                ORION_CM: <span class="t-val">RECOVERED</span> 
+                ESM_PYRO: <span class="t-val">0x8F2A CONFIRMED</span> 
+            </div>
+        </div>
+
         <div class="main-container">
             <aside class="sidebar-blueprint">
                 <div class="user-profile">
@@ -450,7 +387,6 @@
                             <span style="writing-mode: vertical-rl; transform: rotate(180deg); color:#fff; font-size:7px; font-weight:bold; height:100%; text-align:center;">SRB (STBD) JETTISONED</span>
                             <div class="srb-nozzle"></div>
                         </div>
-                        
                         <div class="stage-las"></div>
                         <div class="shape stage-cm" style="border-color: var(--accent-green); box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);">
                             <span style="font-size:6px; color:#fff;">ORION</span>
@@ -488,71 +424,44 @@
                 <div class="stage-label-box" style="border-top: none; padding-top: 0; margin-top: 15px;">
                     <div class="blueprint-header" style="margin-bottom: 10px;">DEEP SPACE NETWORK LINKS</div>
                     <div class="dsn-grid">
-                        
                         <div class="dsn-node active-link" id="dsn-gds">
                             <div class="dsn-dish-icon">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
-                                    <path d="M12 6v6l4 2"></path>
-                                </svg>
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
                             </div>
                             <div class="dsn-info">
-                                <strong>GOLDSTONE (GDS)</strong>
-                                <div class="dsn-loc">CALIFORNIA, USA</div>
-                                <div class="dsn-signals">
-                                    <span class="uplink"><span class="anim-up">▲</span> <span class="up-val">12.4</span> kbps</span>
-                                    <span class="downlink"><span class="anim-down">▼</span> <span class="down-val">2.14</span> Mbps</span>
-                                </div>
+                                <strong>GOLDSTONE (GDS)</strong><div class="dsn-loc">CALIFORNIA, USA</div>
+                                <div class="dsn-signals"><span class="uplink"><span class="anim-up">▲</span> 12.4 kbps</span><span class="downlink"><span class="anim-down">▼</span> 2.14 Mbps</span></div>
                             </div>
                             <div class="pulse-status"></div>
                         </div>
-
                         <div class="dsn-node active-link" id="dsn-mds">
                             <div class="dsn-dish-icon">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
-                                    <path d="M12 6v6l4 2"></path>
-                                </svg>
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
                             </div>
                             <div class="dsn-info">
-                                <strong>MADRID (MDS)</strong>
-                                <div class="dsn-loc">MADRID, SPAIN</div>
-                                <div class="dsn-signals">
-                                    <span class="uplink"><span class="anim-up">▲</span> <span class="up-val">8.2</span> kbps</span>
-                                    <span class="downlink"><span class="anim-down">▼</span> <span class="down-val">1.85</span> Mbps</span>
-                                </div>
+                                <strong>MADRID (MDS)</strong><div class="dsn-loc">MADRID, SPAIN</div>
+                                <div class="dsn-signals"><span class="uplink"><span class="anim-up">▲</span> 8.2 kbps</span><span class="downlink"><span class="anim-down">▼</span> 1.85 Mbps</span></div>
                             </div>
                             <div class="pulse-status"></div>
                         </div>
-
                         <div class="dsn-node" id="dsn-cds">
                             <div class="dsn-dish-icon">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
-                                    <path d="M12 6v6l4 2"></path>
-                                </svg>
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
                             </div>
                             <div class="dsn-info">
-                                <strong>CANBERRA (CDS)</strong>
-                                <div class="dsn-loc">ACT, AUSTRALIA</div>
-                                <div class="dsn-signals">
-                                    <span class="uplink"><span class="anim-up" style="animation:none; opacity:0.3;">▲</span> <span class="up-val">0.0</span> kbps</span>
-                                    <span class="downlink"><span class="anim-down" style="animation:none; opacity:0.3;">▼</span> <span class="down-val">0.00</span> Mbps</span>
-                                </div>
+                                <strong>CANBERRA (CDS)</strong><div class="dsn-loc">ACT, AUSTRALIA</div>
+                                <div class="dsn-signals"><span class="uplink"><span class="anim-up" style="animation:none; opacity:0.3;">▲</span> 0.0 kbps</span><span class="downlink"><span class="anim-down" style="animation:none; opacity:0.3;">▼</span> 0.00 Mbps</span></div>
                             </div>
                             <div class="pulse-status pulse-standby"></div>
                         </div>
-
                     </div>
                 </div>
-
 
                 <div class="integrity-box">
                     <div class="integrity-title">ARCHIVE DECRYPTION STATUS</div>
                     <div class="integrity-bar"><div class="integrity-fill"></div></div>
                     <div style="font-size:8px; color:var(--text-muted); display:flex; justify-content:space-between;">
-                        <span>BLOCKS: 4892/5104</span>
-                        <span style="color:var(--accent-blue)">SYNCING...</span>
+                        <span>BLOCKS: 4892/5104</span><span style="color:var(--accent-blue)">SYNCING...</span>
                     </div>
                 </div>
             </aside>
@@ -560,20 +469,28 @@
             <main class="content-area">
                 <div class="graphs-grid">
                     <div class="chart-box">
-                        <div class="chart-title"><span>ORION CM: ENTRY THERMAL LOAD</span> <span>APR 2026 ARCHIVE</span></div>
-                        <canvas id="thermalChart"></canvas>
+                        <div class="chart-title"><span>RS-25 ENGINE ASCENT: LOX & PRESSURE</span> <span>E2047</span></div>
+                        <div class="chart-container"><canvas id="engineChart"></canvas></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title"><span>RS-25 ASCENT PRESSURE LOG</span> <span>ARCHIVED</span></div>
-                        <canvas id="engineChart"></canvas>
+                        <div class="chart-title"><span>ORION CM: ENTRY THERMODYNAMICS</span> <span>EI+</span></div>
+                        <div class="chart-container"><canvas id="thermalChart"></canvas></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title"><span>CREW G-FORCE PROFILE</span> <span>FULL MISSION</span></div>
-                        <canvas id="gforceChart"></canvas>
+                        <div class="chart-title"><span>CREW KINEMATICS: 3-AXIS G-FORCE</span> <span>MISSION</span></div>
+                        <div class="chart-container"><canvas id="gforceChart"></canvas></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title"><span>RADIATION DOSIMETRY (VAN ALLEN)</span> <span>FINAL DATA</span></div>
-                        <canvas id="radChart"></canvas>
+                        <div class="chart-title"><span>VAN ALLEN TRANSIT: DOSIMETRY</span> <span>HERA PROBE</span></div>
+                        <div class="chart-container"><canvas id="radChart"></canvas></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title"><span>ECLSS: CABIN O2 / CO2 SCRUBBING</span> <span>LUNAR</span></div>
+                        <div class="chart-container"><canvas id="eclssChart"></canvas></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title"><span>DSN COMMS: LATENCY & BER</span> <span>FAR-SIDE</span></div>
+                        <div class="chart-container"><canvas id="commsChart"></canvas></div>
                     </div>
                 </div>
 
@@ -615,16 +532,9 @@
                     <div class="table-wrapper">
                         <table class="heatshield-table" id="leaderboard-table">
                             <thead>
-                                <tr>
-                                    <th>RANK</th>
-                                    <th>ANALYST NAME</th>
-                                    <th>TEAM / REGION</th>
-                                    <th>AUTH ID</th>
-                                    <th>ASSIGNMENT STATUS</th>
-                                </tr>
+                                <tr><th>RANK</th><th>ANALYST NAME</th><th>TEAM / REGION</th><th>AUTH ID</th><th>ASSIGNMENT STATUS</th></tr>
                             </thead>
-                            <tbody>
-                                </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -652,24 +562,17 @@
 
     <div id="fullscreen-viewer" onclick="closeViewer()">
         <img id="fullscreen-img" src="">
-        <div id="fullscreen-text-wrapper">
-            <div id="fullscreen-text"></div>
-        </div>
+        <div id="fullscreen-text-wrapper"><div id="fullscreen-text"></div></div>
         <div style="color: var(--text-muted); margin-top: 20px; font-size: 11px; letter-spacing: 2px; text-align: center;">[ CLICK ANYWHERE TO CLOSE ]</div>
     </div>
 
     <script>
-        // --- HELPER FUNKCIJAS LATVIJAS LAIKAM ---
+        // --- TIME HELPER (LATVIA SPECIFIC) ---
         function getLatvianDateString() {
-            return new Date().toLocaleDateString('en-GB', {
-                timeZone: 'Europe/Riga', day: '2-digit', month: 'short', year: 'numeric'
-            }).toUpperCase();
+            return new Date().toLocaleDateString('en-GB', { timeZone: 'Europe/Riga', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
         }
-
         function getLatvianTimeString() {
-            return new Date().toLocaleTimeString('en-GB', {
-                timeZone: 'Europe/Riga', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
+            return new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/Riga', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
         // --- ANTI-SNOOPING ---
@@ -681,7 +584,6 @@
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
             const err = document.getElementById('login-error');
-            
             if(u === 'Victoria2026' && p === 'ARTVIC26@METLAT') {
                 document.getElementById('login-screen').style.display = 'none';
                 startBootSequence();
@@ -690,29 +592,22 @@
                 setTimeout(() => err.innerText = "", 3000);
             }
         }
+        document.getElementById('pass').addEventListener('keypress', e => { if (e.key === 'Enter') verifyLogin(); });
 
-        document.getElementById('pass').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') verifyLogin();
-        });
-
-        // --- MISSION TIMER (AUTHENTICITY TOUCH & LOCAL TIME) ---
+        // --- MISSION TIMER ---
         function startMissionTimer() {
             const splashdownDate = new Date("April 10, 2026 14:00:00").getTime();
-            
             document.getElementById('riga-date').innerText = getLatvianDateString();
             document.getElementById('log-date').innerText = getLatvianDateString();
             
             setInterval(() => {
                 const now = new Date().getTime();
                 const distance = now - splashdownDate;
-                
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                
                 document.getElementById("splash-timer").innerHTML = `T+ AFTER SPLASHDOWN: ${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M ${seconds.toString().padStart(2, '0')}S`;
-                
                 document.getElementById('riga-time-clock').innerText = getLatvianTimeString();
             }, 1000);
         }
@@ -743,23 +638,108 @@
             setTimeout(() => { 
                 bootScreen.style.display = 'none'; 
                 document.getElementById('main-ui').style.display = 'flex'; 
-                initCharts(); 
-                startTerminal(); 
-                loadDatabase();
-                startMissionTimer();
+                initCharts(); startTerminal(); loadDatabase(); startMissionTimer();
             }, delay + 800);
         }
 
-        // --- CHART.JS CONFIGURATIONS ---
+        // --- COMPLEX CHART GENERATION (MASSIVE DATA) ---
         Chart.defaults.color = '#64748b';
         Chart.defaults.font.family = "'Courier New', Courier, monospace";
+        Chart.defaults.font.size = 9;
+
+        // Helper: Generate noisy data arrays
+        function genNoise(length, base, volatility, trendFunc = null) {
+            return Array.from({length}, (_, i) => {
+                let v = base + (Math.random() - 0.5) * volatility;
+                if(trendFunc) v = trendFunc(v, i, length);
+                return Math.max(0, parseFloat(v.toFixed(2))); // No negative values unless needed
+            });
+        }
 
         function initCharts() {
-            const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(30, 58, 138, 0.2)' } }, y: { grid: { color: 'rgba(30, 58, 138, 0.2)' } } }, elements: { point: { radius: 0 } } };
-            new Chart(document.getElementById('thermalChart'), { type: 'line', data: { labels: ['EI', 'EI+2m', 'EI+4m', 'EI+6m', 'EI+8m', 'EI+10m', 'SPLASH'], datasets: [{ data: [20, 1500, 2760, 2500, 1200, 400, 25], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }] }, options: commonOptions });
-            new Chart(document.getElementById('engineChart'), { type: 'line', data: { labels: ['T-0', 'T+1m', 'T+2m', 'T+3m', 'T+4m', 'T+6m', 'MECO'], datasets: [ { data: [0, 104, 109, 109, 104, 109, 0], borderColor: '#06b6d4', borderWidth: 2, tension: 0.1 } ] }, options: commonOptions });
-            new Chart(document.getElementById('gforceChart'), { type: 'line', data: { labels: ['LAUNCH', 'SRB SEP', 'MECO', 'TLI', 'COAST', 'ENTRY', 'CHUTES'], datasets: [{ data: [1.5, 2.5, 3.8, 1.2, 0, 8.5, 3.2], borderColor: '#f59e0b', borderWidth: 2, tension: 0.3, stepped: true }] }, options: commonOptions });
-            new Chart(document.getElementById('radChart'), { type: 'bar', data: { labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10'], datasets: [{ data: [0.3, 0.4, 0.1, 0.1, 0.05, 0.1, 0.1, 0.4, 0.3, 0.1], backgroundColor: '#2563eb' }] }, options: commonOptions });
+            const pts = 120; // High resolution data points
+            const labels = Array.from({length: pts}, (_, i) => `T+${i}`);
+            
+            const gridOpts = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
+            const commOpts = { 
+                responsive: true, maintainAspectRatio: false, 
+                plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } }, 
+                elements: { point: { radius: 0, hitRadius: 5 }, line: { borderWidth: 1.5, tension: 0.2 } },
+                interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            };
+
+            // 1. ENGINE CHART (Dual Axis: Pressure & LOX Flow)
+            // MECO at ~80% of the timeline
+            const enginePressure = genNoise(pts, 3000, 50, (v, i, l) => i < l*0.8 ? v + i*0.5 : 0);
+            const engineFlow = genNoise(pts, 3060, 20, (v, i, l) => i < l*0.8 ? v : 0);
+            new Chart(document.getElementById('engineChart'), { 
+                type: 'line', data: { labels, datasets: [
+                    { label: 'Chamber Pressure (psia)', data: enginePressure, borderColor: '#06b6d4', yAxisID: 'y' },
+                    { label: 'LOX Flow (kg/s)', data: engineFlow, borderColor: '#3b82f6', borderDash: [5, 5], yAxisID: 'y1' }
+                ]}, 
+                options: { ...commOpts, scales: { x: { display: false }, y: { type: 'linear', position: 'left', grid: gridOpts }, y1: { type: 'linear', position: 'right', grid: { display: false } } } } 
+            });
+
+            // 2. THERMAL CHART (Internal vs External & Ablation)
+            // Spikes at ~85% (Entry Interface)
+            const extTemp = genNoise(pts, -50, 10, (v, i, l) => i > l*0.8 ? (i > l*0.9 ? v + (l-i)*200 : v + (i - l*0.8)*250) : v);
+            const intTemp = genNoise(pts, 22, 1, (v, i, l) => i > l*0.8 ? v + 4 : v);
+            new Chart(document.getElementById('thermalChart'), { 
+                type: 'line', data: { labels, datasets: [
+                    { label: 'External Hull (°C)', data: extTemp, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.4 },
+                    { label: 'Cabin Ambient (°C)', data: intTemp, borderColor: '#10b981' }
+                ]}, 
+                options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
+            });
+
+            // 3. G-FORCE CHART (3 Axis Kinematics)
+            const gx = genNoise(pts, 0, 0.2, (v,i,l) => {
+                if(i < l*0.1) return v + 1.5; // Launch
+                if(i > l*0.2 && i < l*0.25) return v + 3; // SRB Sep
+                if(i > l*0.75 && i < l*0.8) return v + 4; // MECO
+                if(i > l*0.85 && i < l*0.9) return v + 8.5; // Re-entry
+                return v;
+            });
+            const gy = genNoise(pts, 0, 0.5); // Lateral vibes
+            const gz = genNoise(pts, 0, 0.3); // Spin/Roll
+            new Chart(document.getElementById('gforceChart'), { 
+                type: 'line', data: { labels, datasets: [
+                    { label: 'X-Axis (g)', data: gx, borderColor: '#f59e0b', stepped: true },
+                    { label: 'Y-Axis (g)', data: gy, borderColor: 'rgba(6, 182, 212, 0.5)', borderWidth: 1 },
+                    { label: 'Z-Axis (g)', data: gz, borderColor: 'rgba(239, 68, 68, 0.5)', borderWidth: 1 }
+                ]}, 
+                options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
+            });
+
+            // 4. RADIATION (Bar chart of flux events)
+            const radLabels = Array.from({length: 40}, (_, i) => `HR ${i}`);
+            const flux = genNoise(40, 0.1, 0.05, (v, i) => (i>5 && i<10) || (i>30 && i<35) ? v + Math.random()*0.8 : v);
+            new Chart(document.getElementById('radChart'), { 
+                type: 'bar', data: { labels: radLabels, datasets: [{ label: 'Dose Equivalent (mSv)', data: flux, backgroundColor: '#8b5cf6' }] }, 
+                options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
+            });
+
+            // 5. ECLSS (O2 Consump & CO2 Cycles)
+            const o2 = genNoise(pts, 14.7, 0.02, (v,i) => v - (i*0.01)); // Slow drop
+            const co2 = genNoise(pts, 0.04, 0.005, (v,i) => v + Math.sin(i/5)*0.02); // Scrubber cycles
+            new Chart(document.getElementById('eclssChart'), { 
+                type: 'line', data: { labels, datasets: [
+                    { label: 'ppO2 (PSI)', data: o2, borderColor: '#10b981', yAxisID: 'y' },
+                    { label: 'CO2 (PSI)', data: co2, borderColor: '#f59e0b', yAxisID: 'y1' }
+                ]}, 
+                options: { ...commOpts, scales: { x: { display: false }, y: { position: 'left', grid: gridOpts }, y1: { position: 'right', grid: { display: false } } } } 
+            });
+
+            // 6. DSN COMMS (Latency & Bit Error Rate)
+            const latency = genNoise(pts, 1.28, 0.05, (v,i,l) => (i > l*0.4 && i < l*0.6) ? 0 : v); // LOS Far side
+            const ber = genNoise(pts, 0.0001, 0.0001, (v,i,l) => (i > l*0.35 && i < l*0.4) ? v + Math.random()*0.5 : v); // Static before drop
+            new Chart(document.getElementById('commsChart'), { 
+                type: 'line', data: { labels, datasets: [
+                    { label: 'OWLT Latency (s)', data: latency, borderColor: '#06b6d4', fill: true, backgroundColor: 'rgba(6, 182, 212, 0.1)' },
+                    { label: 'Bit Error Rate', data: ber, borderColor: '#ef4444' }
+                ]}, 
+                options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
+            });
         }
 
         // --- TERMINAL LOG GENERATOR ---
@@ -767,27 +747,32 @@
             const logContent = document.getElementById('log-content');
             const termWrap = document.getElementById('term-log');
             const messages = [ 
-                "SYNCING DATA WITH USS JOHN P. MURTHA...", 
-                "VERIFYING CHECKSUM: E2047_TELEMETRY.dat", 
-                "EXTRACTING ORION CABIN AUDIO...", 
-                "PARSING HISTORICAL FLIGHT DYNAMICS LOGS...", 
-                "CM SEPARATION PYRO SEQUENCE CONFIRMED.",
-                "UPLINKING FINAL REPORT TO PENTAGON SERVER...",
-                "RUNNING BACKGROUND DECRYPTION [BLOCK 4892]..."
+                "SYNCING DSN TELEMETRY STREAM...", "VERIFYING CHECKSUM: E2047_LOG.dat", 
+                "EXTRACTING ORION CABIN AUDIO [AES-256]...", "PARSING FLIGHT DYNAMICS KINEMATICS...", 
+                "CM SEPARATION PYRO SEQUENCE CONFIRMED.", "UPLINKING FINAL REPORT TO PENTAGON...",
+                "DECRYPTING BLOCK 4892 [HEX DUMP INITIATED]...", "ECLSS AMINE SCRUBBER CYCLE LOGGED."
             ];
             setInterval(() => {
                 const msg = messages[Math.floor(Math.random() * messages.length)];
                 const time = getLatvianTimeString();
-                const isSuccess = msg.includes("CONFIRMED") || msg.includes("SUCCESS");
+                const isSuccess = msg.includes("CONFIRMED") || msg.includes("LOGGED");
+                
+                // Occasional Hex code spit
+                if(Math.random() > 0.8) {
+                    let hex = ""; for(let i=0;i<8;i++) hex += Math.random().toString(16).substr(2, 4).toUpperCase() + " ";
+                    const he = document.createElement('div'); he.className = 'log-entry';
+                    he.innerHTML = `<span style="color:var(--text-muted)">>${hex}</span>`;
+                    logContent.appendChild(he);
+                }
+
                 const el = document.createElement('div'); el.className = 'log-entry';
                 el.innerHTML = `<span class="log-time">[${time}]</span> <span class="${isSuccess ? 'log-success' : ''}">${msg}</span>`;
                 logContent.appendChild(el); 
-                
                 termWrap.scrollTop = termWrap.scrollHeight;
-            }, 2500);
+            }, 2000);
         }
 
-        // --- LEADERBOARD DATA GENERATION (Reāli NASA/ESA inženieri un tu) ---
+        // --- LEADERBOARD ---
         function buildLeaderboard() {
             const tbody = document.querySelector("#leaderboard-table tbody");
             const players = [
@@ -800,54 +785,31 @@
                 { name: "SARAH JENKINS", team: "NASA / USA", id: "US-91A2-F", status: "CLEARED" },
                 { name: "YUKI TANAKA", team: "JAXA / JAPAN", id: "JP-33V8-X", status: "CLEARED" },
                 { name: "LUCAS SILVA", team: "AEB / BRAZIL", id: "BR-41C4-K", status: "CLEARED" },
-                { name: "AMARA DIALLO", team: "ASA / SENEGAL", id: "SN-99P1-M", status: "CLEARED" },
-                { name: "HENRIK ODEGARD", team: "NOSA / NORWAY", id: "NO-22D7-E", status: "PENDING REVIEW" },
-                { name: "PRIYA PATEL", team: "UKSA / UK", id: "GB-66T3-L", status: "CLEARED" },
-                { name: "WEI CHEN", team: "CNSA / CHINA", id: "CN-88W9-Q", status: "RESTRICTED ACCESS" },
-                { name: "FRANCOIS DUBOIS", team: "CNES / FRANCE", id: "FR-55N2-Y", status: "CLEARED" },
-                { name: "MARIA GONZALES", team: "INTA / SPAIN", id: "ES-11Z5-H", status: "CLEARED" },
-                { name: "THOMAS VANCE", team: "CSA / CANADA", id: "CA-44R6-J", status: "CLEARED" },
-                { name: "LARS BECKER", team: "DLR / GERMANY", id: "DE-22B9-S", status: "CLEARED" },
-                { name: "EMMA NILSSON", team: "SNSA / SWEDEN", id: "SE-66K2-D", status: "PENDING REVIEW" }
+                { name: "AMARA DIALLO", team: "ASA / SENEGAL", id: "SN-99P1-M", status: "CLEARED" }
             ];
 
             let rowsHtml = '';
             players.forEach((p, index) => {
                 const rank = index + 1;
-                
-                // Īpašas krāsas un vizuālie efekti 1. un 2. vietai
                 let rankClass = 'rank-badge';
-                if(rank === 1) rankClass += ' rank-1';
-                if(rank === 2) rankClass += ' rank-2';
-
-                let statusColor = p.status === 'PRIORITY ASSIGNED' ? 'var(--accent-cyan)' : 
-                                  p.status === 'CLEARED' ? 'var(--accent-green)' : 
-                                  p.status === 'RESTRICTED ACCESS' ? 'var(--accent-red)' : 'var(--accent-gold)';
-                
-                let nameColor = (rank === 1 || rank === 2) ? '#fff' : 'var(--text-main)';
+                if(rank === 1) rankClass += ' rank-1'; if(rank === 2) rankClass += ' rank-2';
+                let statusColor = p.status === 'PRIORITY ASSIGNED' ? 'var(--accent-cyan)' : p.status === 'CLEARED' ? 'var(--accent-green)' : 'var(--accent-gold)';
                 let fw = (rank === 1 || rank === 2) ? 'bold' : 'normal';
-
-                rowsHtml += `
-                    <tr>
-                        <td><span class="${rankClass}">0${rank.toString().padStart(2, '0')}</span></td>
-                        <td style="color:${nameColor}; font-weight:${fw};">${p.name}</td>
-                        <td style="color:var(--text-muted);">${p.team}</td>
-                        <td style="font-family:var(--font-mono); color:var(--accent-blue);">${p.id}</td>
-                        <td style="color:${statusColor}; font-weight:bold;">${p.status}</td>
-                    </tr>
-                `;
+                
+                rowsHtml += `<tr>
+                    <td><span class="${rankClass}">0${rank.toString().padStart(2, '0')}</span></td>
+                    <td style="color:${rank<=2?'#fff':'var(--text-main)'}; font-weight:${fw};">${p.name}</td>
+                    <td style="color:var(--text-muted);">${p.team}</td>
+                    <td style="font-family:var(--font-mono); color:var(--accent-blue);">${p.id}</td>
+                    <td style="color:${statusColor}; font-weight:bold;">${p.status}</td>
+                </tr>`;
             });
             tbody.innerHTML = rowsHtml;
         }
+        document.addEventListener("DOMContentLoaded", buildLeaderboard);
 
-        // IZSAUCAM UZREIZ, LAI TABULA GARANTĒTI IELĀDĒTOS (Pat pirms animācijas)
-        document.addEventListener("DOMContentLoaded", () => {
-            buildLeaderboard();
-        });
-
-        // --- MASSIVE DATABASE GENERATION ---
-const imgPool = [
-            // === YOUR ORIGINAL 25+ IMAGES (kept 100% intact) ===
+        // --- DATABASE GENERATION ---
+        const imgPool = [
             "https://live.staticflickr.com/65535/55200122336_8d6756f6a9_6k.jpg", "https://live.staticflickr.com/65535/55200266103_f9f5a07753_6k.jpg", 
             "https://live.staticflickr.com/65535/55196918247_026e7cffe8_6k.jpg", "https://live.staticflickr.com/65535/55178108936_1c65adb37e_6k.jpg", 
             "https://live.staticflickr.com/65535/55178366804_7770ea01b5_6k.jpg", "https://live.staticflickr.com/65535/55157743705_4f1f71cd25_6k.jpg", 
@@ -864,33 +826,39 @@ const imgPool = [
             "https://upload.wikimedia.org/wikipedia/commons/5/58/Space_Shuttle_external_tank_assembly_01.jpg",
             "https://images-assets.nasa.gov/image/jsc2022e045002/jsc2022e045002~large.jpg?w=1920&h=1440&fit=clip&crop=faces%2Cfocalpoint",
             "https://media.cnn.com/api/v1/images/stellar/prod/ksc-20200702-ph-ilw01-0002-large.jpg?c=original",
+            "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiyiZKLdxdfH61rWVYJkuio5ZQKlznvNQGaFrjmbPkqt9vdyKBN4UqGbdkO7ua7KTDlzCVCRzxRSh1L8EZW1dA8vVD1i-O2NtjfDJSS-yK8YNHBpS1vlVCqhshxoSGG1QK1eVXbecQ232ly6GUwTmEC1uBYJCao6voi2itVRL3JLbx6cAcVl1X_COHEseU/s7924/IMG%201.jpg",
+            "https://i0.wp.com/spaceq.ca/wp-content/uploads/2025/10/53029298832_5b66061f3a_k.jpg?resize=780%2C520&ssl=1",
+            "https://cdn8.futura-sciences.com/a1280/images/OrionESM_modeleStructure_jNum4_uin22TAS1.jpg",
+            "https://cdn.mos.cms.futurecdn.net/v2/t:0,l:338,cw:2028,ch:1521,q:80,w:2028/kprYenJa8bMuhwxcVzD6tC.jpg",
+            "https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA20krED.img?w=768&h=512&m=6",
+            "https://i.abcnewsfe.com/a/78982245-024f-43a7-a715-31919aed534e/orion-2-ht-gmh-260331_1774981314972_hpMain_4x3.jpg",
+            "https://www.barrons.com/asset/external-media/afp/AFP6779749244140105254695813556010634287445---1.jpg",
+            "https://preview.redd.it/rocket-propulsion-reference-sheets-v0-inzysxtht2wb1.jpg?width=1080&crop=smart&auto=webp&s=21c00952cbd0ca1a064d2a4468dd01fc84ec2220",
+            "https://i0.wp.com/semiengineering.com/wp-content/uploads/2019/12/Cadence_rocket-equation-earth-orbit-fig4-scaled.png?ssl=1"
         ];
 
         let dbSource = [];
         const agencies = ["NASA // FIDO", "DOD // JTF", "NRO // SIGINT", "USSF // RADAR", "ESA // ESM OPS"];
+        const imgSubjects = ["LUNAR FAR-SIDE RECON", "ORION CM RECOVERY OPTICAL", "SLS ASCENT TRACKING", "BOOSTER SEP TELEMETRY", "ESM DEPLOYMENT VERIFICATION", "HEATSHIELD INSPECTION OPTICAL", "PAD 39B PRE-LAUNCH STRUCTURAL"];
         
         for(let i=0; i<imgPool.length; i++) {
             dbSource.push({
-                id: `OPT-${Math.floor(Math.random()*9000)+1000}-A`,
-                b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: "CLASSIFIED OPTICAL ARCHIVE", f: "DEEP SPACE NETWORK",
+                id: `OPT-${Math.floor(Math.random()*9000)+1000}-A`, b: agencies[Math.floor(Math.random()*agencies.length)],
+                s: imgSubjects[Math.floor(Math.random()*imgSubjects.length)], f: "DEEP SPACE NETWORK",
                 c: Math.random() > 0.5 ? "TS/SCI" : "SECRET", img: i, type: 'img'
             });
         }
 
         const textSubjects = [
-            { s: "ORBITAL DYNAMICS // TLI VECTORS", key: "orbit" },
-            { s: "THERMODYNAMICS // AVCOAT ABLATION", key: "thermal" },
-            { s: "ECLSS // CABIN O2 RESERVES", key: "eclss" },
-            { s: "RS-25 CORE STAGE TELEMETRY", key: "engine" }
+            { s: "ORBITAL DYNAMICS // TLI VECTORS", key: "orbit" }, { s: "THERMODYNAMICS // AVCOAT ABLATION", key: "thermal" },
+            { s: "ECLSS // CABIN O2 RESERVES", key: "eclss" }, { s: "PROPULSION // RS-25 CORE TELEMETRY", key: "engine" },
+            { s: "BIOMEDICAL // CREW RADIATION DOSIMETRY", key: "radiation" }, { s: "COMMUNICATIONS // LUNAR RELAY PROTOCOL", key: "comms" }
         ];
 
-        for(let i=0; i<12; i++) {
-            let subj = textSubjects[Math.floor(Math.random()*textSubjects.length)];
+        for(let i=0; i<textSubjects.length; i++) {
             dbSource.push({
-                id: `SYS-LOG-${Math.floor(Math.random()*90000)+10000}`,
-                b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: subj.s, f: "JSC DATABASE", c: "TS/SCI", img: -1, type: subj.key
+                id: `SYS-LOG-${Math.floor(Math.random()*90000)+10000}`, b: agencies[Math.floor(Math.random()*agencies.length)],
+                s: textSubjects[i].s, f: "JSC DATABASE", c: "TS/SCI", img: -1, type: textSubjects[i].key
             });
         }
 
@@ -902,18 +870,13 @@ const imgPool = [
         function loadDatabase() {
             const grid = document.getElementById('data-grid');
             document.getElementById('asset-count').innerText = `TOTAL HISTORICAL ASSETS: ${dbSource.length}`;
-            
             let html = '';
             dbSource.forEach((data, index) => {
                 let cColor = data.c.includes('TS/SCI') ? 'var(--accent-red)' : 'var(--accent-gold)';
                 let content = data.img === -1 ? `<div class="text-doc-icon">DAT</div>` : `<img src="${imgPool[data.img]}" class="card-img" loading="lazy">`;
-                
                 html += `
                 <div class="card" onclick="openFile(${index})">
-                    <div class="card-img-container">
-                        ${content}
-                        <div class="overlay-badge">${data.b}</div>
-                    </div>
+                    <div class="card-img-container">${content}<div class="overlay-badge">${data.b}</div></div>
                     <div class="card-meta">
                         <div class="meta-row"><span class="meta-label">ID:</span> <span class="meta-value">${data.id}</span></div>
                         <div class="meta-row"><span class="meta-label">SUBJ:</span> <span class="meta-value" style="font-size:8px;">${data.s}</span></div>
@@ -924,7 +887,6 @@ const imgPool = [
             grid.innerHTML = html;
         }
 
-        // --- DYNAMIC RICH TEXT/BLUEPRINT GENERATOR ---
         function getRealDataDump(type) {
             const date = getLatvianDateString();
             let html = `<div style="border-bottom: 1px solid var(--accent-cyan); margin-bottom: 15px; padding-bottom: 10px;">
@@ -933,95 +895,76 @@ const imgPool = [
             </div>`;
 
             if(type === 'orbit') {
-                html += `
-                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: LUNAR FREE-RETURN TRAJECTORY</div>
+                html += `<div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: LUNAR FREE-RETURN TRAJECTORY</div>
                 <div style="background:rgba(37, 99, 235, 0.1); padding: 10px; border-left: 3px solid var(--accent-blue); margin-bottom: 15px; font-size:11px;">
                     <span style="color:var(--text-muted);">[ORBITAL MECHANICS]</span><br>
-                    > Vis-viva Eq: <span style="color:var(--accent-green);">v² = GM * (2/r - 1/a)</span><br>
-                    > Tsiolkovsky Eq: <span style="color:var(--accent-green);">Δv = I_sp * g_0 * ln(m_0 / m_f)</span>
+                    > Vis-viva Eq: <span style="color:var(--accent-green);">v<sup>2</sup> = GM * (2/r - 1/a)</span><br>
+                    > Tsiolkovsky Eq: <span style="color:var(--accent-green);">Δv = v_e * ln(m_0 / m_f)</span>
                 </div>
                 <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
                     <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>PARAMETER</th><th>RECORDED VALUE</th></tr>
                     <tr><td style="padding:4px 0;">Distance (r)</td><td style="color:var(--accent-cyan);">413,142.05 km (Apolune)</td></tr>
-                    <tr><td style="padding:4px 0;">Semi-major Axis (a)</td><td>208,500.00 km</td></tr>
-                    <tr><td style="padding:4px 0;">Calculated Δv</td><td style="color:var(--accent-green);">8,985 m/s</td></tr>
+                    <tr><td style="padding:4px 0;">Calculated Δv (TLI Burn)</td><td style="color:var(--accent-green);">3,124 m/s</td></tr>
                 </table>
-                <div style="font-size:10px; color:var(--accent-gold); margin-bottom:5px;">TRAJECTORY VISUALIZATION (TLI -> LUNAR FLYBY):</div>
-                <div style="font-family:monospace; white-space:pre; color:var(--accent-blue); background:#000; padding:15px; border:1px solid var(--panel-border); overflow-x:auto;">
-     EARTH [Z]                           MOON [M]
-      (O)  --→ → → → → → → → → → → → → → →   ( )
-         \\                           /
-          \\_ _ _ _ _ _ _ _ _ _ _ _ _/
-            RETURN TRAJECTORY V_r
-                </div>
                 <div style="margin-top:15px; color:var(--accent-green); font-weight:bold;">[STATUS] TRAJECTORY NOMINAL. LUNAR FLYBY SUCCESSFUL.</div>`;
             } else if(type === 'thermal') {
-                html += `
-                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: ORION AVCOAT HEAT SHIELD ABLATION</div>
+                html += `<div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: ORION AVCOAT HEAT SHIELD ABLATION</div>
                 <div style="background:rgba(239, 68, 68, 0.1); padding: 10px; border-left: 3px solid var(--accent-red); margin-bottom: 15px; font-size:11px;">
                     <span style="color:var(--text-muted);">[THERMODYNAMICS CALCULATION]</span><br>
-                    > Sutton-Graves Eq: <span style="color:var(--accent-red);">q_s = k * (ρ / R_N)^0.5 * v³</span><br>
-                    > Entry Velocity (v): Mach 32 (10,958 m/s)
-                </div>
-                <div style="font-size:10px; color:var(--text-muted); margin-bottom:5px;">THERMAL LOAD BAR GRAPH (ENTRY INTERFACE):</div>
-                <div style="background:#000; padding:10px; border:1px solid var(--panel-border); margin-bottom:15px; font-size:10px;">
-                    <div style="margin-bottom:6px;">EI+2m [1500°C]: <div style="height:6px; width:45%; background:var(--accent-gold); margin-top:2px;"></div></div>
-                    <div style="margin-bottom:6px;">EI+4m [2760°C]: <div style="height:6px; width:95%; background:var(--accent-red); margin-top:2px;"></div></div>
-                    <div style="margin-bottom:6px;">EI+6m [2500°C]: <div style="height:6px; width:85%; background:var(--accent-red); margin-top:2px;"></div></div>
-                    <div>EI+8m [1200°C]: <div style="height:6px; width:30%; background:var(--accent-gold); margin-top:2px;"></div></div>
+                    > Entry Velocity (v): Mach 32 (10,958 m/s)<br>
+                    > Peak Stagnation Temp: 2,760°C (5,000°F)
                 </div>
                 <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
                     <tr><td style="padding:4px 0;">Pre-Flight Thickness</td><td style="color:#fff;">4.10 cm</td></tr>
-                    <tr><td style="padding:4px 0;">Post-Flight Thickness</td><td style="color:var(--accent-red);">2.41 cm (41% Ablated)</td></tr>
+                    <tr><td style="padding:4px 0;">Post-Flight Thickness</td><td style="color:var(--accent-red);">2.41 cm (41.2% Ablated)</td></tr>
                 </table>
-                <div style="color:var(--accent-green); font-weight:bold;">[STATUS] HULL INTEGRITY 99.8%. CREW SURVIVAL 100%.</div>`;
+                <div style="color:var(--accent-green); font-weight:bold;">[STATUS] HULL INTEGRITY 99.8%. SKIP-ENTRY BURN NOMINAL.</div>`;
             } else if(type === 'eclss') {
-                html += `
-                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: ECLSS LIFE SUPPORT SYSTEMS</div>
+                html += `<div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: ECLSS LIFE SUPPORT SYSTEMS</div>
                 <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
                     <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>SYSTEM COMPONENT</th><th>STATUS / METRIC</th></tr>
                     <tr><td style="padding:6px 0;">Cabin Pressure</td><td style="color:var(--accent-cyan);">14.7 psi (101.3 kPa)</td></tr>
-                    <tr><td style="padding:6px 0;">Partial O2 (ppO2)</td><td style="color:var(--accent-cyan);">3.1 psi (21.4 kPa)</td></tr>
                     <tr><td style="padding:6px 0;">Total O2 Consumed</td><td>33.6 kg (4 Crew / 10 Days)</td></tr>
                     <tr><td style="padding:6px 0;">Amine Swingbed Eff.</td><td style="color:var(--accent-green);">98.7% (CO2 Scrubbing)</td></tr>
                 </table>
-                <div style="background:rgba(16, 185, 129, 0.1); padding: 10px; border-left: 3px solid var(--accent-green); font-size:11px;">
-                    <span style="color:var(--text-muted);">[CHEMICAL REACTION - SCRUBBER]</span><br>
-                    > <span style="color:#fff;">R-NH2 + CO2 + H2O <-> R-NH3+ + HCO3-</span>
-                </div>
                 <div style="margin-top:15px; color:var(--accent-green); font-weight:bold;">[STATUS] ECLSS NOMINAL THROUGH ENTIRE DURATION.</div>`;
-            } else {
-                html += `
-                <div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: RS-25 ENGINE ASCENT PROFILE</div>
+            } else if (type === 'radiation') {
+                html += `<div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: BIOMEDICAL // CREW RADIATION DOSIMETRY</div>
+                <div style="background:rgba(139, 92, 246, 0.1); padding: 10px; border-left: 3px solid #8b5cf6; margin-bottom: 15px; font-size:11px;">
+                    <span style="color:var(--text-muted);">[VAN ALLEN BELT TRANSIT]</span><br>
+                    > Inner Belt Flux: <span style="color:var(--accent-red);">Protons > 100 MeV</span>
+                </div>
+                <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
+                    <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>CREW MEMBER</th><th>DOSIMETER (HERA)</th><th>MISSION TOTAL</th></tr>
+                    <tr><td style="padding:4px 0;">CDR Wiseman</td><td style="color:#fff;">Active</td><td style="color:var(--accent-cyan);">1.12 mSv</td></tr>
+                    <tr><td style="padding:4px 0;">MS1 Koch</td><td style="color:#fff;">Active</td><td style="color:var(--accent-cyan);">1.14 mSv</td></tr>
+                </table>
+                <div style="color:var(--accent-green); font-weight:bold;">[STATUS] RADIATION EXPOSURE WELL WITHIN LEO/BEO LIMITS.</div>`;
+            } else if (type === 'comms') {
+                html += `<div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: COMMUNICATIONS // LUNAR RELAY PROTOCOL</div>
+                <div style="background:rgba(6, 182, 212, 0.1); padding: 10px; border-left: 3px solid var(--accent-cyan); margin-bottom: 15px; font-size:11px;">
+                    <span style="color:var(--text-muted);">[DSN KA-BAND LINK METRICS]</span><br>
+                    > Frequency: <span style="color:#fff;">32 GHz (Downlink)</span><br>
+                    > One-Way Light Time (OWLT): <span style="color:var(--accent-cyan);">1.28 Seconds</span>
+                </div>
+                <table style="width:100%; text-align:left; font-size:11px; border-collapse: collapse;">
+                    <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>DATA STREAM</th><th>BANDWIDTH</th><th>ENCRYPTION</th></tr>
+                    <tr><td style="padding:4px 0;">Telemetry</td><td style="color:var(--accent-gold);">12 Kbps</td><td>AES-256</td></tr>
+                    <tr><td style="padding:4px 0;">Optical Video</td><td style="color:var(--accent-cyan);">2.14 Mbps</td><td>DOD-MAC</td></tr>
+                </table>
+                <div style="margin-top:15px; color:var(--accent-green); font-weight:bold;">[STATUS] DSN HANDOVERS SUCCESSFUL. 0% CRITICAL DATA LOSS.</div>`;
+            } else { // engine
+                html += `<div style="color:#fff; margin-bottom: 10px; font-weight:bold;">SUBJECT: RS-25 ENGINE ASCENT PROFILE</div>
                 <div style="background:rgba(245, 158, 11, 0.1); padding: 10px; border-left: 3px solid var(--accent-gold); margin-bottom: 15px; font-size:11px;">
                     <span style="color:var(--text-muted);">[PROPULSION DATA AT MECO]</span><br>
                     > Chamber Pressure: <span style="color:#fff;">3,008 psia (20.7 MPa)</span><br>
-                    > Mass Flow (LOX): <span style="color:var(--accent-cyan);">3,061 kg/s</span><br>
-                    > Mass Flow (LH2): <span style="color:var(--accent-cyan);">510 kg/s</span>
+                    > Mass Flow (LOX): <span style="color:var(--accent-cyan);">3,061 kg/s</span>
                 </div>
-                <div style="font-size:10px; color:var(--text-muted); margin-bottom:5px;">ENGINE THRUST OUTPUT LOG:</div>
-                <div style="background:#000; padding:15px; border:1px solid var(--panel-border); margin-bottom:15px;">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
-                        <span>E2047:</span>
-                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
-                        <span style="color:var(--accent-green);">109%</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
-                        <span>E2059:</span>
-                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
-                        <span style="color:var(--accent-green);">109%</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
-                        <span>E2062:</span>
-                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
-                        <span style="color:var(--accent-green);">109%</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:10px;">
-                        <span>E2063:</span>
-                        <div style="width:70%; background:#222; border:1px solid #444;"><div style="width:100%; height:100%; background:var(--accent-green);"></div></div>
-                        <span style="color:var(--accent-green);">109%</span>
-                    </div>
-                </div>
+                <table style="width:100%; text-align:left; font-size:11px; margin-bottom:15px; border-collapse: collapse;">
+                    <tr style="border-bottom:1px solid var(--panel-border); color:var(--text-muted);"><th>ENGINE ID</th><th>HPFTP (RPM)</th><th>THROTTLE MAX</th></tr>
+                    <tr><td style="padding:4px 0;">E2047</td><td>28,120</td><td style="color:var(--accent-green);">109%</td></tr>
+                    <tr><td style="padding:4px 0;">E2059</td><td>28,105</td><td style="color:var(--accent-green);">109%</td></tr>
+                </table>
                 <div style="color:var(--accent-green); font-weight:bold;">[STATUS] CORE STAGE SEPARATION CONFIRMED. SAFELY EXPENDED.</div>`;
             }
             return html;
