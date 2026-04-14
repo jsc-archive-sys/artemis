@@ -329,6 +329,46 @@
             .terminal-log, .crew-matrix { height: 250px; }
             .leaderboard-container { max-height: 350px; }
         }
+
+                /* --- DSN NETWORK STYLES --- */
+        .dsn-grid { display: flex; flex-direction: column; gap: 8px; }
+        .dsn-node { 
+            display: flex; align-items: center; background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--panel-border); padding: 8px 10px; border-radius: 4px;
+            position: relative; overflow: hidden; transition: all 0.3s ease;
+        }
+        .dsn-node::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background: var(--text-muted); transition: background 0.3s;
+        }
+        .dsn-node.active-link::before { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        .dsn-dish-icon { margin-right: 12px; display: flex; align-items: center; opacity: 0.7; }
+        .dsn-node.active-link .dsn-dish-icon { opacity: 1; stroke: var(--accent-cyan); }
+        
+        .dsn-info { flex: 1; display: flex; flex-direction: column; justify-content: center;}
+        .dsn-info strong { color: #fff; font-size: 10px; font-family: var(--font-sans); letter-spacing: 1px; }
+        .dsn-loc { font-size: 8px; color: var(--text-muted); margin-bottom: 4px; }
+        
+        .dsn-signals { display: flex; gap: 12px; font-size: 9px; font-weight: bold; font-family: var(--font-mono);}
+        .uplink { color: var(--accent-gold); display: flex; align-items: center; gap: 4px; }
+        .downlink { color: var(--accent-cyan); display: flex; align-items: center; gap: 4px; }
+        
+        /* Signal Animations */
+        .anim-up { animation: floatUp 0.8s infinite alternate; display: inline-block; }
+        .anim-down { animation: floatDown 0.8s infinite alternate; display: inline-block; }
+        
+        @keyframes floatUp { 0% { transform: translateY(1px); opacity: 0.4; } 100% { transform: translateY(-2px); opacity: 1; } }
+        @keyframes floatDown { 0% { transform: translateY(-1px); opacity: 0.4; } 100% { transform: translateY(2px); opacity: 1; } }
+
+        /* Status Dot */
+        .pulse-status { 
+            width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); 
+            margin-left: 10px; box-shadow: 0 0 8px var(--accent-green); 
+            animation: dsnPulse 1.5s infinite; flex-shrink: 0;
+        }
+        .pulse-standby { background: var(--text-muted); box-shadow: none; animation: none; opacity: 0.5; }
+        
+        @keyframes dsnPulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -444,6 +484,68 @@
                     <div class="p-stat"><span>ENGINE E2047:</span> <span style="color:var(--accent-green)">109% (MAX)</span></div>
                     <div class="p-stat"><span>ENGINE E2059:</span> <span style="color:var(--accent-green)">109% (MAX)</span></div>
                 </div>
+
+                <div class="stage-label-box" style="border-top: none; padding-top: 0; margin-top: 15px;">
+                    <div class="blueprint-header" style="margin-bottom: 10px;">DEEP SPACE NETWORK LINKS</div>
+                    <div class="dsn-grid">
+                        
+                        <div class="dsn-node active-link" id="dsn-gds">
+                            <div class="dsn-dish-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                            </div>
+                            <div class="dsn-info">
+                                <strong>GOLDSTONE (GDS)</strong>
+                                <div class="dsn-loc">CALIFORNIA, USA</div>
+                                <div class="dsn-signals">
+                                    <span class="uplink"><span class="anim-up">▲</span> <span class="up-val">12.4</span> kbps</span>
+                                    <span class="downlink"><span class="anim-down">▼</span> <span class="down-val">2.14</span> Mbps</span>
+                                </div>
+                            </div>
+                            <div class="pulse-status"></div>
+                        </div>
+
+                        <div class="dsn-node active-link" id="dsn-mds">
+                            <div class="dsn-dish-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                            </div>
+                            <div class="dsn-info">
+                                <strong>MADRID (MDS)</strong>
+                                <div class="dsn-loc">MADRID, SPAIN</div>
+                                <div class="dsn-signals">
+                                    <span class="uplink"><span class="anim-up">▲</span> <span class="up-val">8.2</span> kbps</span>
+                                    <span class="downlink"><span class="anim-down">▼</span> <span class="down-val">1.85</span> Mbps</span>
+                                </div>
+                            </div>
+                            <div class="pulse-status"></div>
+                        </div>
+
+                        <div class="dsn-node" id="dsn-cds">
+                            <div class="dsn-dish-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-blue)" stroke-width="1.5" fill="none">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                            </div>
+                            <div class="dsn-info">
+                                <strong>CANBERRA (CDS)</strong>
+                                <div class="dsn-loc">ACT, AUSTRALIA</div>
+                                <div class="dsn-signals">
+                                    <span class="uplink"><span class="anim-up" style="animation:none; opacity:0.3;">▲</span> <span class="up-val">0.0</span> kbps</span>
+                                    <span class="downlink"><span class="anim-down" style="animation:none; opacity:0.3;">▼</span> <span class="down-val">0.00</span> Mbps</span>
+                                </div>
+                            </div>
+                            <div class="pulse-status pulse-standby"></div>
+                        </div>
+
+                    </div>
+                </div>
+
 
                 <div class="integrity-box">
                     <div class="integrity-title">ARCHIVE DECRYPTION STATUS</div>
@@ -744,7 +846,8 @@
         });
 
         // --- MASSIVE DATABASE GENERATION ---
-        const imgPool = [
+const imgPool = [
+            // === YOUR ORIGINAL 25+ IMAGES (kept 100% intact) ===
             "https://live.staticflickr.com/65535/55200122336_8d6756f6a9_6k.jpg", "https://live.staticflickr.com/65535/55200266103_f9f5a07753_6k.jpg", 
             "https://live.staticflickr.com/65535/55196918247_026e7cffe8_6k.jpg", "https://live.staticflickr.com/65535/55178108936_1c65adb37e_6k.jpg", 
             "https://live.staticflickr.com/65535/55178366804_7770ea01b5_6k.jpg", "https://live.staticflickr.com/65535/55157743705_4f1f71cd25_6k.jpg", 
@@ -760,7 +863,7 @@
             "https://www.nasa.gov/wp-content/uploads/2023/12/ksc-20231127-ph-kls01-0020-2.jpg?w=1920",
             "https://upload.wikimedia.org/wikipedia/commons/5/58/Space_Shuttle_external_tank_assembly_01.jpg",
             "https://images-assets.nasa.gov/image/jsc2022e045002/jsc2022e045002~large.jpg?w=1920&h=1440&fit=clip&crop=faces%2Cfocalpoint",
-            "https://media.cnn.com/api/v1/images/stellar/prod/ksc-20200702-ph-ilw01-0002-large.jpg?c=original"
+            "https://media.cnn.com/api/v1/images/stellar/prod/ksc-20200702-ph-ilw01-0002-large.jpg?c=original",
         ];
 
         let dbSource = [];
