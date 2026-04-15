@@ -286,6 +286,12 @@
             .terminal-log, .crew-matrix { height: 250px; }
             .leaderboard-container { max-height: 350px; }
         }
+
+        /* Jauni stili video elementam */
+        #fullscreen-video { max-width: 100%; max-height: 85%; border: 1px solid var(--accent-green); box-shadow: 0 0 30px rgba(0,0,0,0.5); display: none; border-radius: 4px; background: #000; outline: none; }
+        
+        /* Ikona video failiem režģī */
+        .vid-doc-icon { font-size: 30px; color: var(--accent-green); font-family: var(--font-sans); font-weight: bold;}
     </style>
 </head>
 <body>
@@ -562,6 +568,7 @@
 
     <div id="fullscreen-viewer" onclick="closeViewer()">
         <img id="fullscreen-img" src="">
+        <video id="fullscreen-video" controls autoplay onclick="event.stopPropagation()"></video>
         <div id="fullscreen-text-wrapper"><div id="fullscreen-text"></div></div>
         <div style="color: var(--text-muted); margin-top: 20px; font-size: 11px; letter-spacing: 2px; text-align: center;">[ CLICK ANYWHERE TO CLOSE ]</div>
     </div>
@@ -647,17 +654,16 @@
         Chart.defaults.font.family = "'Courier New', Courier, monospace";
         Chart.defaults.font.size = 9;
 
-        // Helper: Generate noisy data arrays
         function genNoise(length, base, volatility, trendFunc = null) {
             return Array.from({length}, (_, i) => {
                 let v = base + (Math.random() - 0.5) * volatility;
                 if(trendFunc) v = trendFunc(v, i, length);
-                return Math.max(0, parseFloat(v.toFixed(2))); // No negative values unless needed
+                return Math.max(0, parseFloat(v.toFixed(2)));
             });
         }
 
         function initCharts() {
-            const pts = 120; // High resolution data points
+            const pts = 120;
             const labels = Array.from({length: pts}, (_, i) => `T+${i}`);
             
             const gridOpts = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
@@ -668,8 +674,6 @@
                 interaction: { mode: 'nearest', axis: 'x', intersect: false }
             };
 
-            // 1. ENGINE CHART (Dual Axis: Pressure & LOX Flow)
-            // MECO at ~80% of the timeline
             const enginePressure = genNoise(pts, 3000, 50, (v, i, l) => i < l*0.8 ? v + i*0.5 : 0);
             const engineFlow = genNoise(pts, 3060, 20, (v, i, l) => i < l*0.8 ? v : 0);
             new Chart(document.getElementById('engineChart'), { 
@@ -680,8 +684,6 @@
                 options: { ...commOpts, scales: { x: { display: false }, y: { type: 'linear', position: 'left', grid: gridOpts }, y1: { type: 'linear', position: 'right', grid: { display: false } } } } 
             });
 
-            // 2. THERMAL CHART (Internal vs External & Ablation)
-            // Spikes at ~85% (Entry Interface)
             const extTemp = genNoise(pts, -50, 10, (v, i, l) => i > l*0.8 ? (i > l*0.9 ? v + (l-i)*200 : v + (i - l*0.8)*250) : v);
             const intTemp = genNoise(pts, 22, 1, (v, i, l) => i > l*0.8 ? v + 4 : v);
             new Chart(document.getElementById('thermalChart'), { 
@@ -692,16 +694,15 @@
                 options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
             });
 
-            // 3. G-FORCE CHART (3 Axis Kinematics)
             const gx = genNoise(pts, 0, 0.2, (v,i,l) => {
-                if(i < l*0.1) return v + 1.5; // Launch
-                if(i > l*0.2 && i < l*0.25) return v + 3; // SRB Sep
-                if(i > l*0.75 && i < l*0.8) return v + 4; // MECO
-                if(i > l*0.85 && i < l*0.9) return v + 8.5; // Re-entry
+                if(i < l*0.1) return v + 1.5;
+                if(i > l*0.2 && i < l*0.25) return v + 3;
+                if(i > l*0.75 && i < l*0.8) return v + 4;
+                if(i > l*0.85 && i < l*0.9) return v + 8.5;
                 return v;
             });
-            const gy = genNoise(pts, 0, 0.5); // Lateral vibes
-            const gz = genNoise(pts, 0, 0.3); // Spin/Roll
+            const gy = genNoise(pts, 0, 0.5);
+            const gz = genNoise(pts, 0, 0.3);
             new Chart(document.getElementById('gforceChart'), { 
                 type: 'line', data: { labels, datasets: [
                     { label: 'X-Axis (g)', data: gx, borderColor: '#f59e0b', stepped: true },
@@ -711,7 +712,6 @@
                 options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
             });
 
-            // 4. RADIATION (Bar chart of flux events)
             const radLabels = Array.from({length: 40}, (_, i) => `HR ${i}`);
             const flux = genNoise(40, 0.1, 0.05, (v, i) => (i>5 && i<10) || (i>30 && i<35) ? v + Math.random()*0.8 : v);
             new Chart(document.getElementById('radChart'), { 
@@ -719,9 +719,8 @@
                 options: { ...commOpts, scales: { x: { display: false }, y: { grid: gridOpts } } } 
             });
 
-            // 5. ECLSS (O2 Consump & CO2 Cycles)
-            const o2 = genNoise(pts, 14.7, 0.02, (v,i) => v - (i*0.01)); // Slow drop
-            const co2 = genNoise(pts, 0.04, 0.005, (v,i) => v + Math.sin(i/5)*0.02); // Scrubber cycles
+            const o2 = genNoise(pts, 14.7, 0.02, (v,i) => v - (i*0.01));
+            const co2 = genNoise(pts, 0.04, 0.005, (v,i) => v + Math.sin(i/5)*0.02);
             new Chart(document.getElementById('eclssChart'), { 
                 type: 'line', data: { labels, datasets: [
                     { label: 'ppO2 (PSI)', data: o2, borderColor: '#10b981', yAxisID: 'y' },
@@ -730,9 +729,8 @@
                 options: { ...commOpts, scales: { x: { display: false }, y: { position: 'left', grid: gridOpts }, y1: { position: 'right', grid: { display: false } } } } 
             });
 
-            // 6. DSN COMMS (Latency & Bit Error Rate)
-            const latency = genNoise(pts, 1.28, 0.05, (v,i,l) => (i > l*0.4 && i < l*0.6) ? 0 : v); // LOS Far side
-            const ber = genNoise(pts, 0.0001, 0.0001, (v,i,l) => (i > l*0.35 && i < l*0.4) ? v + Math.random()*0.5 : v); // Static before drop
+            const latency = genNoise(pts, 1.28, 0.05, (v,i,l) => (i > l*0.4 && i < l*0.6) ? 0 : v);
+            const ber = genNoise(pts, 0.0001, 0.0001, (v,i,l) => (i > l*0.35 && i < l*0.4) ? v + Math.random()*0.5 : v);
             new Chart(document.getElementById('commsChart'), { 
                 type: 'line', data: { labels, datasets: [
                     { label: 'OWLT Latency (s)', data: latency, borderColor: '#06b6d4', fill: true, backgroundColor: 'rgba(6, 182, 212, 0.1)' },
@@ -757,7 +755,6 @@
                 const time = getLatvianTimeString();
                 const isSuccess = msg.includes("CONFIRMED") || msg.includes("LOGGED");
                 
-                // Occasional Hex code spit
                 if(Math.random() > 0.8) {
                     let hex = ""; for(let i=0;i<8;i++) hex += Math.random().toString(16).substr(2, 4).toUpperCase() + " ";
                     const he = document.createElement('div'); he.className = 'log-entry';
@@ -808,7 +805,7 @@
         }
         document.addEventListener("DOMContentLoaded", buildLeaderboard);
 
-        // --- DATABASE GENERATION ---
+        // --- DATABASE GENERATION (TĪRĪTS NO DUBLIKĀTIEM) ---
         const imgPool = [
             "https://live.staticflickr.com/65535/55200122336_8d6756f6a9_6k.jpg", "https://live.staticflickr.com/65535/55200266103_f9f5a07753_6k.jpg", 
             "https://live.staticflickr.com/65535/55196918247_026e7cffe8_6k.jpg", "https://live.staticflickr.com/65535/55178108936_1c65adb37e_6k.jpg", 
@@ -834,21 +831,40 @@
             "https://i.abcnewsfe.com/a/78982245-024f-43a7-a715-31919aed534e/orion-2-ht-gmh-260331_1774981314972_hpMain_4x3.jpg",
             "https://www.barrons.com/asset/external-media/afp/AFP6779749244140105254695813556010634287445---1.jpg",
             "https://preview.redd.it/rocket-propulsion-reference-sheets-v0-inzysxtht2wb1.jpg?width=1080&crop=smart&auto=webp&s=21c00952cbd0ca1a064d2a4468dd01fc84ec2220",
-            "https://i0.wp.com/semiengineering.com/wp-content/uploads/2019/12/Cadence_rocket-equation-earth-orbit-fig4-scaled.png?ssl=1"
+            "https://i0.wp.com/semiengineering.com/wp-content/uploads/2019/12/Cadence_rocket-equation-earth-orbit-fig4-scaled.png?ssl=1",
+            "https://video.twimg.com/ext_tw_video/2044207278048587776/pu/vid/avc1/720x1280/Kl1JA-jnrix8OeVx.mp4"
+        ];
+
+        // 1. JAUNUMS: Video saraksts
+        const videoPool = [
+            "https://images-assets.nasa.gov/video/KSC-20260401-MH-AJN01-0001-Artemis_II_Isolated_Launch_Views-M19183/KSC-20260401-MH-AJN01-0001-Artemis_II_Isolated_Launch_Views-M19183~orig.mp4", 
+            "Kl1JA-jnrix8OeVx-ART-OR-CON.mp4",
+            "https://images-assets.nasa.gov/video/art002m1200912231A_SAJ-Jettison_SAW2/art002m1200912231A_SAJ-Jettison_SAW2~orig.mp4"
         ];
 
         let dbSource = [];
         const agencies = ["NASA // FIDO", "DOD // JTF", "NRO // SIGINT", "USSF // RADAR", "ESA // ESM OPS"];
         const imgSubjects = ["LUNAR FAR-SIDE RECON", "ORION CM RECOVERY OPTICAL", "SLS ASCENT TRACKING", "BOOSTER SEP TELEMETRY", "ESM DEPLOYMENT VERIFICATION", "HEATSHIELD INSPECTION OPTICAL", "PAD 39B PRE-LAUNCH STRUCTURAL"];
         
+        // Pievienojam attēlus datubāzei
         for(let i=0; i<imgPool.length; i++) {
             dbSource.push({
                 id: `OPT-${Math.floor(Math.random()*9000)+1000}-A`, b: agencies[Math.floor(Math.random()*agencies.length)],
                 s: imgSubjects[Math.floor(Math.random()*imgSubjects.length)], f: "DEEP SPACE NETWORK",
-                c: Math.random() > 0.5 ? "TS/SCI" : "SECRET", img: i, type: 'img'
+                c: Math.random() > 0.5 ? "TS/SCI" : "SECRET", index: i, type: 'img'
             });
         }
 
+        // 2. JAUNUMS: Pievienojam video datubāzei
+        for(let i=0; i<videoPool.length; i++) {
+            dbSource.push({
+                id: `VID-${Math.floor(Math.random()*9000)+1000}-V`, b: "DOD // CYBER",
+                s: "FLIGHT CAMERA FOOTAGE", f: "MEDIA ARCHIVE",
+                c: "TS/SCI", index: i, type: 'video'
+            });
+        }
+
+        // Pievienojam teksta failus
         const textSubjects = [
             { s: "ORBITAL DYNAMICS // TLI VECTORS", key: "orbit" }, { s: "THERMODYNAMICS // AVCOAT ABLATION", key: "thermal" },
             { s: "ECLSS // CABIN O2 RESERVES", key: "eclss" }, { s: "PROPULSION // RS-25 CORE TELEMETRY", key: "engine" },
@@ -858,10 +874,11 @@
         for(let i=0; i<textSubjects.length; i++) {
             dbSource.push({
                 id: `SYS-LOG-${Math.floor(Math.random()*90000)+10000}`, b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: textSubjects[i].s, f: "JSC DATABASE", c: "TS/SCI", img: -1, type: textSubjects[i].key
+                s: textSubjects[i].s, f: "JSC DATABASE", c: "TS/SCI", index: -1, type: textSubjects[i].key
             });
         }
 
+        // Sajaucam failus vietām (shuffle)
         for (let i = dbSource.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [dbSource[i], dbSource[j]] = [dbSource[j], dbSource[i]];
@@ -871,11 +888,21 @@
             const grid = document.getElementById('data-grid');
             document.getElementById('asset-count').innerText = `TOTAL HISTORICAL ASSETS: ${dbSource.length}`;
             let html = '';
-            dbSource.forEach((data, index) => {
+            dbSource.forEach((data, i) => {
                 let cColor = data.c.includes('TS/SCI') ? 'var(--accent-red)' : 'var(--accent-gold)';
-                let content = data.img === -1 ? `<div class="text-doc-icon">DAT</div>` : `<img src="${imgPool[data.img]}" class="card-img" loading="lazy">`;
+                
+                // 3. JAUNUMS: Noteikt, kādu saturu rādīt kartītē
+                let content = '';
+                if(data.type === 'img') {
+                    content = `<img src="${imgPool[data.index]}" class="card-img" loading="lazy">`;
+                } else if(data.type === 'video') {
+                    content = `<div class="vid-doc-icon">VID</div>`;
+                } else {
+                    content = `<div class="text-doc-icon">DAT</div>`;
+                }
+
                 html += `
-                <div class="card" onclick="openFile(${index})">
+                <div class="card" onclick="openFile(${i})">
                     <div class="card-img-container">${content}<div class="overlay-badge">${data.b}</div></div>
                     <div class="card-meta">
                         <div class="meta-row"><span class="meta-label">ID:</span> <span class="meta-value">${data.id}</span></div>
@@ -979,13 +1006,16 @@
             const hexDump = document.getElementById('hex-dump');
             const fullViewer = document.getElementById('fullscreen-viewer');
             const fullImg = document.getElementById('fullscreen-img');
+            const fullVideo = document.getElementById('fullscreen-video');
             const fullTextWrapper = document.getElementById('fullscreen-text-wrapper');
             const fullText = document.getElementById('fullscreen-text');
             
             modal.style.display = 'block'; overlay.style.display = 'block';
             progress.style.width = '0%'; text.innerText = "Extracting archived file from DSN Node...";
             hexDump.innerHTML = "";
-            fullImg.style.display = 'none'; fullTextWrapper.style.display = 'none';
+            fullImg.style.display = 'none'; 
+            fullVideo.style.display = 'none';
+            fullTextWrapper.style.display = 'none';
 
             const hexInt = setInterval(() => {
                 let r = ""; for(let i=0; i<6; i++) r += Math.random().toString(16).substr(2, 8).toUpperCase() + " ";
@@ -1002,9 +1032,14 @@
                     setTimeout(() => {
                         modal.style.display = 'none'; overlay.style.display = 'none';
                         fullViewer.style.display = 'flex';
+                        
+                        // 4. JAUNUMS: Loģika, ko tieši parādīt
                         if(data.type === 'img') {
                             fullImg.style.display = 'block';
-                            fullImg.src = imgPool[data.img];
+                            fullImg.src = imgPool[data.index];
+                        } else if(data.type === 'video') {
+                            fullVideo.style.display = 'block';
+                            fullVideo.src = videoPool[data.index];
                         } else {
                             fullTextWrapper.style.display = 'block';
                             fullText.innerHTML = getRealDataDump(data.type); 
@@ -1015,10 +1050,15 @@
             }, 60);
         }
 
+        // 5. JAUNUMS: Apstādinām video, kad logs tiek aizvērts
         function closeViewer() {
             document.getElementById('fullscreen-viewer').style.display = 'none';
             document.getElementById('fullscreen-img').src = "";
             document.getElementById('fullscreen-text').innerHTML = "";
+            
+            const videoElement = document.getElementById('fullscreen-video');
+            videoElement.pause();
+            videoElement.src = "";
         }
     </script>
 </body>
