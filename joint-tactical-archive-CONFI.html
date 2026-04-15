@@ -642,10 +642,16 @@
                 }, delay);
                 delay += 400 + Math.random() * 500;
             });
-            setTimeout(() => { 
+           setTimeout(() => { 
                 bootScreen.style.display = 'none'; 
                 document.getElementById('main-ui').style.display = 'flex'; 
                 initCharts(); startTerminal(); loadDatabase(); startMissionTimer();
+
+                // Pārbaudām, vai saitē ir Hash (piemēram, #OPT-1234-A)
+                if(window.location.hash) {
+                    const fileId = window.location.hash.substring(1); // Noņemam '#'
+                    setTimeout(() => { openFile(fileId); }, 800); // Īsa pauze, lai UI paspēj ielādēties
+                }
             }, delay + 800);
         }
 
@@ -806,6 +812,7 @@
         document.addEventListener("DOMContentLoaded", buildLeaderboard);
 
         // --- DATABASE GENERATION (TĪRĪTS NO DUBLIKĀTIEM) ---
+// --- DATABASE GENERATION (FIKSĒTI ID UN NOSAUKUMI) ---
         const imgPool = [
             "https://live.staticflickr.com/65535/55200122336_8d6756f6a9_6k.jpg", "https://live.staticflickr.com/65535/55200266103_f9f5a07753_6k.jpg", 
             "https://live.staticflickr.com/65535/55196918247_026e7cffe8_6k.jpg", "https://live.staticflickr.com/65535/55178108936_1c65adb37e_6k.jpg", 
@@ -835,7 +842,6 @@
             "https://video.twimg.com/ext_tw_video/2044207278048587776/pu/vid/avc1/720x1280/Kl1JA-jnrix8OeVx.mp4"
         ];
 
-        // 1. JAUNUMS: Video saraksts
         const videoPool = [
             "https://images-assets.nasa.gov/video/KSC-20260401-MH-AJN01-0001-Artemis_II_Isolated_Launch_Views-M19183/KSC-20260401-MH-AJN01-0001-Artemis_II_Isolated_Launch_Views-M19183~orig.mp4", 
             "Kl1JA-jnrix8OeVx-ART-OR-CON.mp4",
@@ -846,20 +852,25 @@
         const agencies = ["NASA // FIDO", "DOD // JTF", "NRO // SIGINT", "USSF // RADAR", "ESA // ESM OPS"];
         const imgSubjects = ["LUNAR FAR-SIDE RECON", "ORION CM RECOVERY OPTICAL", "SLS ASCENT TRACKING", "BOOSTER SEP TELEMETRY", "ESM DEPLOYMENT VERIFICATION", "HEATSHIELD INSPECTION OPTICAL", "PAD 39B PRE-LAUNCH STRUCTURAL"];
         
-        // Pievienojam attēlus datubāzei
+        // Pievienojam attēlus datubāzei, izmantojot matemātiku ar i, lai ID nemainītos
         for(let i=0; i<imgPool.length; i++) {
             dbSource.push({
-                id: `OPT-${Math.floor(Math.random()*9000)+1000}-A`, b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: imgSubjects[Math.floor(Math.random()*imgSubjects.length)], f: "DEEP SPACE NETWORK",
-                c: Math.random() > 0.5 ? "TS/SCI" : "SECRET", index: i, type: 'img'
+                id: `OPT-${1000 + (i * 313) % 8999}-A`, 
+                b: agencies[i % agencies.length],
+                s: imgSubjects[i % imgSubjects.length], 
+                f: "DEEP SPACE NETWORK",
+                c: (i % 2 === 0) ? "TS/SCI" : "SECRET", 
+                index: i, type: 'img'
             });
         }
 
-        // 2. JAUNUMS: Pievienojam video datubāzei
+        // Pievienojam video datubāzei
         for(let i=0; i<videoPool.length; i++) {
             dbSource.push({
-                id: `VID-${Math.floor(Math.random()*9000)+1000}-V`, b: "DOD // CYBER",
-                s: "FLIGHT CAMERA FOOTAGE", f: "MEDIA ARCHIVE",
+                id: `VID-${2000 + (i * 414) % 7999}-V`, 
+                b: "DOD // CYBER",
+                s: "FLIGHT CAMERA FOOTAGE", 
+                f: "MEDIA ARCHIVE",
                 c: "TS/SCI", index: i, type: 'video'
             });
         }
@@ -873,25 +884,24 @@
 
         for(let i=0; i<textSubjects.length; i++) {
             dbSource.push({
-                id: `SYS-LOG-${Math.floor(Math.random()*90000)+10000}`, b: agencies[Math.floor(Math.random()*agencies.length)],
-                s: textSubjects[i].s, f: "JSC DATABASE", c: "TS/SCI", index: -1, type: textSubjects[i].key
+                id: `SYS-LOG-${10000 + (i * 1111)}`, 
+                b: agencies[(i + 2) % agencies.length],
+                s: textSubjects[i].s, 
+                f: "JSC DATABASE", c: "TS/SCI", index: -1, type: textSubjects[i].key
             });
         }
 
-        // Sajaucam failus vietām (shuffle)
-        for (let i = dbSource.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [dbSource[i], dbSource[j]] = [dbSource[j], dbSource[i]];
-        }
+        // Kārtojam failus pēc to unikālā ID alfabēta secībā. 
+        // Tas sajauc attēlus, video un tekstus kopā, bet lapa vienmēr izskatīsies vienādi.
+        dbSource.sort((a, b) => a.id.localeCompare(b.id));
 
-        function loadDatabase() {
+function loadDatabase() {
             const grid = document.getElementById('data-grid');
             document.getElementById('asset-count').innerText = `TOTAL HISTORICAL ASSETS: ${dbSource.length}`;
             let html = '';
-            dbSource.forEach((data, i) => {
+            dbSource.forEach((data) => {
                 let cColor = data.c.includes('TS/SCI') ? 'var(--accent-red)' : 'var(--accent-gold)';
                 
-                // 3. JAUNUMS: Noteikt, kādu saturu rādīt kartītē
                 let content = '';
                 if(data.type === 'img') {
                     content = `<img src="${imgPool[data.index]}" class="card-img" loading="lazy">`;
@@ -901,8 +911,9 @@
                     content = `<div class="text-doc-icon">DAT</div>`;
                 }
 
+                // Pievienojam fileId onclick funkcijai
                 html += `
-                <div class="card" onclick="openFile(${i})">
+                <div class="card" onclick="openFile('${data.id}')">
                     <div class="card-img-container">${content}<div class="overlay-badge">${data.b}</div></div>
                     <div class="card-meta">
                         <div class="meta-row"><span class="meta-label">ID:</span> <span class="meta-value">${data.id}</span></div>
@@ -997,8 +1008,14 @@
             return html;
         }
 
-        function openFile(index) {
-            const data = dbSource[index];
+        function openFile(fileId) {
+            // Atrodam failu datubāzē pēc tā ID
+            const data = dbSource.find(d => d.id === fileId);
+            if (!data) return;
+
+            // Nomainām saiti, piemēram, uz index.html#OPT-1234-A
+            history.pushState(null, null, '#' + fileId);
+
             const modal = document.getElementById('modal');
             const overlay = document.getElementById('modal-overlay');
             const progress = document.getElementById('progress-bar');
@@ -1033,7 +1050,6 @@
                         modal.style.display = 'none'; overlay.style.display = 'none';
                         fullViewer.style.display = 'flex';
                         
-                        // 4. JAUNUMS: Loģika, ko tieši parādīt
                         if(data.type === 'img') {
                             fullImg.style.display = 'block';
                             fullImg.src = imgPool[data.index];
@@ -1060,6 +1076,15 @@
             videoElement.pause();
             videoElement.src = "";
         }
+
+        // Automātiskā pieteikšanās, ja saitē jau ir norādīts konkrēts fails
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.location.hash && window.location.hash.length > 3) {
+                document.getElementById('user').value = 'Victoria2026';
+                document.getElementById('pass').value = 'ARTVIC26@METLAT';
+                verifyLogin(); // Palaidīs boot sekvenci un pēc tam failu atvērs automātiski!
+            }
+        });
     </script>
 </body>
 </html>
